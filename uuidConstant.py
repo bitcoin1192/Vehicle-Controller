@@ -1,0 +1,12 @@
+appServiceUUID = "d1a78a60-1ed9-11ed-861d-0242ac120002"
+statusCharacteristicsUUID = "d1a79000-1ed9-11ed-861d-0242ac120002"
+lockCharacteristicUUID = "d1a79212-1ed9-11ed-861d-0242ac120002"
+customOneUUID = "d1a7938e-1ed9-11ed-861d-0242ac120002"
+customTwoUUID= "d1a794ce-1ed9-11ed-861d-0242ac120002"
+customThreeUUID= "d1a79604-1ed9-11ed-861d-0242ac120002"
+customFourthUUID= "d1a7971c-1ed9-11ed-861d-0242ac120002"
+customFifthUUID= "d1a7985c-1ed9-11ed-861d-0242ac120002"
+customSixthUUID= "d1a79992-1ed9-11ed-861d-0242ac120002"
+customSeventhUUID = "d1a79b90-1ed9-11ed-861d-0242ac120002"
+LOCKED = True
+UNLOCKED = False
