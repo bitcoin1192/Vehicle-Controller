@@ -1,5 +1,5 @@
 from pydbus.generic import signal
-from pydbus import SessionBus
+from pydbus import SessionBus, SystemBus
 from gi.repository import GLib
 import RPi.GPIO as Pin
 
@@ -72,7 +72,7 @@ class RelayLogic(object):
 
 def main():
     loop = GLib.MainLoop()
-    bus = SessionBus()
+    bus = SystemBus()
     bus.publish(busName,RelayLogic())
     loop.run()
     
