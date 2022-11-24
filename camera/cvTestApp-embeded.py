@@ -7,6 +7,8 @@ import os
 
 t1 = 255/3
 t2 = 255/2
+cvHaarPath = "/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/haar_alt"
+tflitePath = "/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/model-relu-3.tflite"
 
 class ImageProcessor:
     def __init__(self, CVCaptureDevice) -> None:
@@ -42,13 +44,13 @@ class FaceDetector:
         self.minPixelSize = minPixelSize
         self.fS_scale = setOuterBorder
         self.resizeToPixel = outputSize
-        self.face_cascade = cv2.CascadeClassifier('/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/haar_alt')
+        self.face_cascade = cv2.CascadeClassifier(tflitePath)
         self.tempImage = 0
     
     def getFace(self):
         grayImage = self.ImgProcess.ImagePreProcessing()
         faceImage = []
-        facePosition = self.face_cascade.detectMultiScale(grayImage, scaleFactor=1.1, minNeighbors=6)
+        facePosition = self.face_cascade.detectMultiScale(grayImage, scaleFactor=1.3, minNeighbors=1)
         for faceCoordinate in facePosition:
             x,y,width,height = faceCoordinate
             if width < self.minPixelSize:
@@ -83,7 +85,7 @@ class HelmetDetector:
     def __init__(self, FaceDetector) -> None:        
         #Set tflite model and it's input and output details
         self.FaceDetection = FaceDetector
-        self.interpreter = tf.lite.Interpreter("/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/model-relu-3.tflite")
+        self.interpreter = tf.lite.Interpreter(tflitePath)
         self.interpreter.allocate_tensors()
         self.input_details = self.interpreter.get_input_details()
         self.output_details = self.interpreter.get_output_details()
