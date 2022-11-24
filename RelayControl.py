@@ -2,16 +2,22 @@ from pydbus.generic import signal
 from pydbus import SessionBus, SystemBus
 from gi.repository import GLib
 import RPi.GPIO as Pin
+import time
+import board
+import neopixel
+import math
 
-busName = "com.sisalma.pydbus.RelayController"
+busName = "com.sisalma.pydbus"
 RELAYON = 0
 RELAYOFF = 1
-RelayPin = 27
+RelayPin = 22
+LEDGREEN = (0,255,12)
+LEDRED = (255,12,0)
 
-class RelayLogic(object):
+class RelayLogic:
     """
     <node>
-      <interface name='com.sisalma.pydbus.RelayController'>
+      <interface name='com.sisalma.pydbus'>
         <method name='BluetoothKeyStatus'>
           <arg type='b' name='a' direction='in'/>
           <arg type='b' name='response' direction='out'/>
@@ -27,9 +33,11 @@ class RelayLogic(object):
     </node>
     """
     def __init__(self):
+        self.pixels = neopixel.NeoPixel(board.D18, 1)
         self.RelayState = RELAYOFF
         self.helmetDetected = False
         self.bluetoothKeyVerified = False
+        self.setupPin()
 
     def BluetoothKeyStatus(self, s):
         self.bluetoothKeyVerified = s
@@ -52,15 +60,17 @@ class RelayLogic(object):
         elif self.RelayState == RELAYOFF:
             Pin.output(RelayPin,Pin.LOW)
         
-    def setupPin():
-        Pin.setup(Pin.BOARD)
-        Pin.setmode(RelayPin, Pin.OUT)
+    def setupPin(self):
+        Pin.setmode(Pin.BCM)
+        Pin.setup(RelayPin, Pin.OUT)
         
     @property
     def LockStatus(self):
         if self.RelayState == RELAYON:
+            self.pixels[0] = (LEDGREEN)
             return "Electrical System is ON!"
         elif self.RelayState == RELAYOFF:
+            self.pixels[0] = (LEDRED)
             return "Off"
 
     @LockStatus.setter
@@ -72,9 +82,10 @@ class RelayLogic(object):
 
 def main():
     loop = GLib.MainLoop()
+    #bus = SessionBus()
     bus = SystemBus()
-    bus.publish(busName,RelayLogic())
+    RelayObject = RelayLogic()
+    bus.publish(busName,RelayObject)
     loop.run()
     
-
 main()
