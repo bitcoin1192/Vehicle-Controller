@@ -13,6 +13,8 @@ RELAYOFF = 1
 RelayPin = 22
 LEDGREEN = (0,255,12)
 LEDRED = (255,12,0)
+LEDOFF = (0,0,0)
+LEDPIN = board.D18
 
 class RelayLogic:
     """
@@ -56,21 +58,22 @@ class RelayLogic:
         
     def stateAction(self):
         if self.RelayState == RELAYON:
+            self.pixels[0] = LEDGREEN
             Pin.output(RelayPin,Pin.HIGH)
         elif self.RelayState == RELAYOFF:
+            self.pixels[0] = LEDRED
             Pin.output(RelayPin,Pin.LOW)
         
     def setupPin(self):
         Pin.setmode(Pin.BCM)
         Pin.setup(RelayPin, Pin.OUT)
+        self.stateAction()
         
     @property
     def LockStatus(self):
         if self.RelayState == RELAYON:
-            self.pixels[0] = (LEDGREEN)
             return "Electrical System is ON!"
         elif self.RelayState == RELAYOFF:
-            self.pixels[0] = (LEDRED)
             return "Off"
 
     @LockStatus.setter
@@ -78,8 +81,12 @@ class RelayLogic:
         self._someProperty = value
         self.PropertiesChanged(busName, {"LockStatus": self.LockStatus}, [])
 
+    def Stop(self):
+        self.pixels[0] = LEDOFF
+
     PropertiesChanged = signal()
 
+fun ToggleLED
 def main():
     loop = GLib.MainLoop()
     #bus = SessionBus()
