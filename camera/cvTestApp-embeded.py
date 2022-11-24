@@ -9,6 +9,7 @@ t1 = 255/3
 t2 = 255/2
 cvHaarPath = "/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/haar_alt"
 tflitePath = "/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/model-relu-3.tflite"
+debug = True
 
 class ImageProcessor:
     def __init__(self, CVCaptureDevice) -> None:
@@ -16,25 +17,35 @@ class ImageProcessor:
         self.vid = CVCaptureDevice
         self.vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
         self.vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+        self.debugFlag = debug
+        self.toc = 0
+        self.tic = 0
 
     def __getImage(self):
         ret, frame = self.vid.read()
+        self.debug()
         if type(frame) == None or ret != True:
             #Spew no image captured error
             pass
         else:
-            #Flip in y axis
-            frame = cv2.flip(frame,1)
+            #Flip in x axis
+            frame = cv2.flip(frame,0)
             return frame
 
     def ImagePreProcessing(self):
         #Convert camera input to opencv gray output
-        gray = cv2.cvtColor(self.__getImage(), cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(self.__getImage(), cv2.COLOR_RGB2GRAY)
         return gray
         #Normalize gray frame
         #norm = cv2.normalize(gray,norm,0,255,cv2.NORM_MINMAX)
         #image_norm = cv2.normalize(gray, None, alpha=0,beta=200, norm_type=cv2.NORM_MINMAX)
         #image_norm = cv2.equalizeHist(gray)
+    
+    def debug(self):
+        if self.debugFlag is True:
+            self.toc = self.tic
+            self.tic = time.time()
+            print("I am fetching image at {} fps".format(1000/((self.tic-self.toc)*1000)))
     
 
 class FaceDetector:
@@ -46,6 +57,7 @@ class FaceDetector:
         self.resizeToPixel = outputSize
         self.face_cascade = cv2.CascadeClassifier(tflitePath)
         self.tempImage = 0
+        self.debugFlag = debug
     
     def getFace(self):
         grayImage = self.ImgProcess.ImagePreProcessing()
@@ -54,7 +66,7 @@ class FaceDetector:
         for faceCoordinate in facePosition:
             x,y,width,height = faceCoordinate
             if width < self.minPixelSize:
-                faceImage = 0
+                faceImage.clear()
                 print("Rejected: Width is less than 128")
             else:
                 start, end = self.calculatePixelLocation(x,y,width,height)
@@ -68,7 +80,7 @@ class FaceDetector:
     
     def getCanny(self):
         cannyImage = []
-        if self.tempImage != 0:
+        if len(self.tempImage) != 0:
             for image in self.tempImage:
                 cannyImage.append(cv2.Canny(image,t1,t2))
         return cannyImage
@@ -91,9 +103,10 @@ class HelmetDetector:
         self.output_details = self.interpreter.get_output_details()
     
     def debug(self, resizeImage, cannyImage):
-        cv2.imshow("debug-1", resizeImage)
-        cv2.imshow("debug-2", cannyImage)
-        cv2.waitKey(10)
+        #cv2.imshow("debug-1", resizeImage)
+        #cv2.imshow("debug-2", cannyImage)
+        #cv2.waitKey(10)
+        pass
 
     def _thresholdFFT(self,TwoDInput):
         fftx = np.fft.fft2(TwoDInput)
@@ -142,12 +155,12 @@ class HelmetDetector:
         while(i < sample):
             output_data = self.runPrediction()
             if output_data is not None:
-                if output_data[0][0] > 0.95:
+                if output_data[0][0] > 0.8:
                     plus = np.array([1,0])
                     tally = np.add(tally,plus)
                     txtPrintImg = ["Helmet Detected",(0,255,0)]
                     i += 1
-                elif output_data[0][1] > 0.95:
+                elif output_data[0][1] > 0.8:
                     plus = np.array([0,1])
                     tally = np.add(tally,plus)
                     txtPrintImg = ["Helmet not Detected",(0,0,255)]
@@ -156,10 +169,11 @@ class HelmetDetector:
             return False
         else:
             return True
+            
 td = ImageProcessor(cv2.VideoCapture(0))
 fd = FaceDetector(td,128,128,1.7)
 hd = HelmetDetector(fd)
 while(True):
-    result = hd.helmetUsed(26)
-    print(result)
+    result = hd.helmetUsed(8)
+    print("You're using helmet is {}".format(result))
 cv2.destroyAllWindows()
