@@ -28,7 +28,7 @@ class RelayLogic:
           <arg type='b' name='a' direction='in'/>
           <arg type='b' name='response' direction='out'/>
         </method>
-        <property name="LockStatus" type="s" access="readwrite">
+        <property name="bluetoothKeyVerified" type="b" access="read">
           <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
         </property>
       </interface>
@@ -37,23 +37,28 @@ class RelayLogic:
     def __init__(self):
         self.pixels = neopixel.NeoPixel(board.D18, 1)
         self.RelayState = RELAYOFF
-        self.helmetDetected = False
-        self.bluetoothKeyVerified = False
-        self.setupPin()
+        self._helmetDetected = False
+        self._bluetoothKeyVerified = False
+        Pin.setmode(Pin.BCM)
+        Pin.setup(RelayPin, Pin.OUT)
+        self.stateAction()
 
     def BluetoothKeyStatus(self, s):
-        self.bluetoothKeyVerified = s
+        self._bluetoothKeyVerified = s
         self.lockUnlockIO()
         
     def HelmetStatus(self, s):
-        self.helmetDetected = s
+        self._helmetDetected = s
         self.lockUnlockIO()
     
     def lockUnlockIO(self):
-        if self.bluetoothKeyVerified and self.helmetDetected:
+        if self._bluetoothKeyVerified and self._helmetDetected:
             self.RelayState = RELAYON
-        else:
+        elif self._bluetoothKeyVerified and not self._helmetDetected:
             self.RelayState = RELAYOFF
+        elif not self._bluetoothKeyVerified :
+            #Send signal to stop detecting helmet on other script listening
+            pass
         self.stateAction()
         
     def stateAction(self):
@@ -64,19 +69,11 @@ class RelayLogic:
             self.pixels[0] = LEDRED
             Pin.output(RelayPin,Pin.LOW)
         
-    def setupPin(self):
-        Pin.setmode(Pin.BCM)
-        Pin.setup(RelayPin, Pin.OUT)
-        self.stateAction()
-        
     @property
-    def LockStatus(self):
-        if self.RelayState == RELAYON:
-            return "Electrical System is ON!"
-        elif self.RelayState == RELAYOFF:
-            return "Off"
+    def _BluetoothKeyVerified(self):
+        return self._bluetoothKeyVerified
 
-    @LockStatus.setter
+    @_BluetoothKeyVerified.setter
     def LockStatus(self, value):
         self._someProperty = value
         self.PropertiesChanged(busName, {"LockStatus": self.LockStatus}, [])
@@ -86,7 +83,6 @@ class RelayLogic:
 
     PropertiesChanged = signal()
 
-fun ToggleLED
 def main():
     loop = GLib.MainLoop()
     #bus = SessionBus()
