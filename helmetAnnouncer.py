@@ -7,8 +7,10 @@ try:
     import board
     import neopixel
     bus = SystemBus()
+    print("Using system bus")
 except ModuleNotFoundError:
     bus = SessionBus()
+    print("Using session bus")
 
 
 def main():

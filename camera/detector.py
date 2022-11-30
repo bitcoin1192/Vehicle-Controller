@@ -6,10 +6,15 @@ import tensorflow as tf
 
 t1 = 255/3
 t2 = 255/2
-cvHaarPath = "/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/haar_alt"
-tflitePath = "/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/model-relu-3.tflite"
-matrixCalibPath = "/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/mtx.correction.npy"
-distortionCalibPath = "/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/dist.correction.npy"
+#cvHaarPath = "/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/haar_alt"
+#tflitePath = "/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/model-relu-3.tflite"
+#matrixCalibPath = "/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/mtx.correction.npy"
+#distortionCalibPath = "/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/dist.correction.npy"
+cvHaarPath = "/home/pi/final-skripsi/camera/haar_alt"
+tflitePath = "/home/pi/final-skripsi/camera/model-relu-3.tflite"
+matrixCalibPath = "/home/pi/final-skripsi/camera/mtx.correction.npy"
+distortionCalibPath = "/home/pi/final-skripsi/camera/dist.correction.npy"
+
 debug = False
 
 class ImageProcessor:

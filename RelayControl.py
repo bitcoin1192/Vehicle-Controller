@@ -7,16 +7,18 @@ import math
 try:
     import board
     import neopixel
-    RelayPin = board.D12
+    RelayPin = 22
     LEDPIN = board.D18
     bus = SystemBus()
     runOnPI = True
+    print("Running on Pi: \n Relay Pin: {}, LED Pin: {}".format(RelayPin,LEDPIN))
 except ModuleNotFoundError:
     #Assuming not running on pi
     RelayPin = 22
     LEDPIN = 18
     bus = SessionBus()
     runOnPI = False
+    print("Not on a Pi")
 
 
 busName = "com.sisalma.pydbus"
