@@ -42,7 +42,7 @@ class ImageProcessor:
             dst = cv2.undistort(frame, self.mtxconst, self.distconst, None, self.newcameramtx)
             dst = dst[y:y+h,x:x+w]
             frame = cv2.flip(dst,0)
-            frame = dst
+            #frame = dst
             return frame
 
     def ImagePreProcessing(self):
@@ -87,6 +87,7 @@ class FaceDetector:
                 if start[0] < 0 or start[1] < 0 or end[0] < 0 or end[1] < 0:
                     pass
                 else:
+                    print("Detecting face")
                     resizeImage = cv2.resize(grayImage[start[1]:end[1],start[0]:end[0]],(128,128),cv2.INTER_AREA)
                     faceImage.append(resizeImage)
         self.tempImage = faceImage

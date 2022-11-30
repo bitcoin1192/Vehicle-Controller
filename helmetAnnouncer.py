@@ -21,7 +21,7 @@ def main():
     try:
         while(True):
             if Controller.bluetoothKeyVerified:
-                result = hd.helmetUsed(12)
+                result = hd.helmetUsed(6)
                 print(result)
                 Controller.HelmetStatus(result)
             else:
