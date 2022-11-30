@@ -3,14 +3,13 @@ import time
 import numpy as np
 import cv2
 import tensorflow as tf
-import os
 
 t1 = 255/3
 t2 = 255/2
-cvHaarPath = "C:/Users/dhiaa/source/repos/final-skripsi/camera/haar_alt"
-tflitePath = "C:/Users/dhiaa/source/repos/final-skripsi/camera/model-relu-3.tflite"
-matrixCalibPath = "C:/Users/dhiaa/source/repos/final-skripsi/camera/mtx.correction.npy"
-distortionCalibPath = "C:/Users/dhiaa/source/repos/final-skripsi/camera/dist.correction.npy"
+cvHaarPath = "/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/haar_alt"
+tflitePath = "/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/model-relu-3.tflite"
+matrixCalibPath = "/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/mtx.correction.npy"
+distortionCalibPath = "/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/dist.correction.npy"
 debug = False
 
 class ImageProcessor:
@@ -22,7 +21,7 @@ class ImageProcessor:
         self.mtxconst = np.load(matrixCalibPath)
         self.distconst = np.load(distortionCalibPath)
         self.newcameramtx, self.roi = cv2.getOptimalNewCameraMatrix(self.mtxconst, self.distconst, (1280,720), 1, (1280,720))
-        self.debugFlag = debug
+        self.debugFlag = True
         self.toc = 0
         self.tic = 0
 
@@ -185,13 +184,3 @@ class HelmetDetector:
             return False
         else:
             return True
-            
-'''
-td = ImageProcessor(cv2.VideoCapture(0))
-fd = FaceDetector(td,128,128,1.7)
-hd = HelmetDetector(fd,0.7)
-while(True):
-    result = hd.helmetUsed(8)
-    print("You're using helmet is {}".format(result))
-cv2.destroyAllWindows()
-'''
