@@ -41,7 +41,7 @@ class ImageProcessor:
             x,y,w,h = self.roi
             dst = cv2.undistort(frame, self.mtxconst, self.distconst, None, self.newcameramtx)
             dst = dst[y:y+h,x:x+w]
-            #frame = cv2.flip(dst,0)
+            frame = cv2.flip(dst,0)
             frame = dst
             return frame
 

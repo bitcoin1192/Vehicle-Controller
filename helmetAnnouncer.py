@@ -27,6 +27,6 @@ def main():
             else:
                 print("Won't run: BluetoothKey is not verified")
                 time.sleep(1)
-    except GLib.error as err:
+    except GLib.Error as err:
         print("Complementary program exitting")
 main()
