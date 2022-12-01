@@ -1,6 +1,7 @@
 from AppServices import AppServices
 from InfoServiceCharacteristics import deviceOwner, lockStatus
 from bluezdbusInterface.gattServices import Service
+from bluezdbusInterface.gattAdvertisement import Advertisement
 import uuidConstant
 import dbus
 try:
@@ -14,7 +15,7 @@ def main():
     mainloop = GObject.MainLoop()
     #Instantiated apps that hold one or more Service
     apps = AppServices(mainloop,bus)
-
+    adv = Advertisement(bus,0,"peripheral")
     #Instantitated Service that hold characteristics
     deviceStatusService = Service(apps.bus, apps.next_index, uuidConstant.statusCharacteristicsUUID, True)
     
@@ -28,6 +29,7 @@ def main():
     apps.add_service(deviceStatusService)
     print(apps.get_path())
     apps.register()
+    adv.register()
     apps.run()
     #apps.quit()
 main()

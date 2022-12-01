@@ -2,6 +2,7 @@ import dbus
 import dbus.service
 from bluezdbusInterface.interfaceConstant import *
 from bluezdbusInterface.adapter import *
+from bluezdbusInterface.dbusException import *
 class Advertisement(dbus.service.Object):
     PATH_BASE = "/org/bluez/apps/advertisement"
 
@@ -96,7 +97,7 @@ class Advertisement(dbus.service.Object):
 
     def register(self):
         bus = self.bus
-        adapter = adapter.find_adapter(bus)
+        adapter = find_adapter(bus,'org.bluez.Adapter1','hci0')
 
         ad_manager = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, adapter),
                                 LE_ADVERTISING_MANAGER_IFACE)
