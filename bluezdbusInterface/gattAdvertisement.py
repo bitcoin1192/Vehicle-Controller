@@ -1,21 +1,13 @@
 import dbus
 import dbus.service
-
-from bletools import BleTools
-
-BLUEZ_SERVICE_NAME = "org.bluez"
-LE_ADVERTISING_MANAGER_IFACE = "org.bluez.LEAdvertisingManager1"
-DBUS_OM_IFACE = "org.freedesktop.DBus.ObjectManager"
-DBUS_PROP_IFACE = "org.freedesktop.DBus.Properties"
-LE_ADVERTISEMENT_IFACE = "org.bluez.LEAdvertisement1"
-
-
+from bluezdbusInterface.interfaceConstant import *
+from bluezdbusInterface.adapter import *
 class Advertisement(dbus.service.Object):
-    PATH_BASE = "/org/bluez/appserver/advertisement"
+    PATH_BASE = "/org/bluez/apps/advertisement"
 
-    def __init__(self, index, advertising_type):
+    def __init__(self, bus , index, advertising_type):
         self.path = self.PATH_BASE + str(index)
-        self.bus = BleTools.get_bus()
+        self.bus = bus
         self.ad_type = advertising_type
         self.local_name = None
         self.service_uuids = None
@@ -103,8 +95,8 @@ class Advertisement(dbus.service.Object):
         print("Failed to register GATT advertisement")
 
     def register(self):
-        bus = BleTools.get_bus()
-        adapter = BleTools.find_adapter(bus)
+        bus = self.bus
+        adapter = adapter.find_adapter(bus)
 
         ad_manager = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, adapter),
                                 LE_ADVERTISING_MANAGER_IFACE)

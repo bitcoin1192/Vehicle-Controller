@@ -1,6 +1,9 @@
 import dbus
-from dbusException import *
-from interfaceConstant import *
+import dbus.service
+import dbus.exceptions
+import dbus.mainloop.glib
+from bluezdbusInterface.dbusException import *
+from bluezdbusInterface.interfaceConstant import *
 
 
 class Service(dbus.service.Object):

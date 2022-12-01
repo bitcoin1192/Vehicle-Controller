@@ -1,12 +1,17 @@
+import dbus
+import dbus.service
+import bluezdbusInterface.adapter as BleTools
 from bluezdbusInterface.gattServices import Service as gattService
 from uuidConstant import *
-from bletools import BleTools
+from bluezdbusInterface.interfaceConstant import *
+from gi.repository import GObject
+
 
 class AppServices(dbus.service.Object):
-    def __init__(self):
+    def __init__(self,bus):
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         self.mainloop = GObject.MainLoop()
-        self.bus = BleTools.get_bus()
+        self.bus = bus
         self.path = "/"
         self.services = []
         self.next_index = 0

@@ -1,6 +1,7 @@
+import dbus
 import dbus.service
-from dbusException import *
-from interfaceConstant import *
+from bluezdbusInterface.dbusException import *
+from bluezdbusInterface.interfaceConstant import *
 
 class Characteristic(dbus.service.Object):
     """
