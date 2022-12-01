@@ -98,6 +98,7 @@ class Advertisement(dbus.service.Object):
     def register(self):
         bus = self.bus
         adapter = find_adapter(bus,'org.bluez.Adapter1','hci0')
+        print(self.get_properties())
 
         ad_manager = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, adapter),
                                 LE_ADVERTISING_MANAGER_IFACE)
