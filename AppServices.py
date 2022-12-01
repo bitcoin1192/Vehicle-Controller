@@ -34,7 +34,7 @@ class AppServices(dbus.service.Object):
                 descs = chrc.get_descriptors()
                 for desc in descs:
                     response[desc.get_path()] = desc.get_properties()
-
+        print(response)
         return response
 
     def register_app_callback(self):
@@ -42,6 +42,7 @@ class AppServices(dbus.service.Object):
 
     def register_app_error_callback(self, error):
         print("Failed to register application: " + str(error))
+        self.quit()
 
     def register(self):
         adapter = BleTools.find_adapter(self.bus,'org.bluez.Adapter1','hci0')

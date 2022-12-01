@@ -16,11 +16,11 @@ def main():
     apps = AppServices(mainloop,bus)
 
     #Instantitated Service that hold characteristics
-    deviceStatusService = Service(apps.bus, apps.next_index, uuidConstant.statusCharacteristicsUUID, False)
+    deviceStatusService = Service(apps.bus, apps.next_index, uuidConstant.statusCharacteristicsUUID, True)
     
     #Instantiated Characteristics of service
-    lockCharacteristic = lockStatus(apps.bus,1,uuidConstant.customOneUUID,["Read"],deviceStatusService)
-    deviceOwnerShip = deviceOwner(apps.bus,2,uuidConstant.customTwoUUID,["Read"],deviceStatusService)
+    lockCharacteristic = lockStatus(apps.bus,1,uuidConstant.customOneUUID,["read","write"],deviceStatusService)
+    deviceOwnerShip = deviceOwner(apps.bus,2,uuidConstant.customTwoUUID,["read","write"],deviceStatusService)
     deviceStatusService.add_characteristic(lockCharacteristic)
     deviceStatusService.add_characteristic(deviceOwnerShip)
 
