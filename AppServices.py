@@ -8,9 +8,8 @@ from gi.repository import GObject
 
 
 class AppServices(dbus.service.Object):
-    def __init__(self,bus):
-        dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-        self.mainloop = GObject.MainLoop()
+    def __init__(self,mainloop,bus):
+        self.mainloop = mainloop
         self.bus = bus
         self.path = "/"
         self.services = []
@@ -45,7 +44,7 @@ class AppServices(dbus.service.Object):
         print("Failed to register application: " + str(error))
 
     def register(self):
-        adapter = BleTools.find_adapter(self.bus)
+        adapter = BleTools.find_adapter(self.bus,'org.bluez.Adapter1','hci0')
 
         service_manager = dbus.Interface(
                 self.bus.get_object(BLUEZ_SERVICE_NAME, adapter),

@@ -13,19 +13,21 @@ def main():
     bus = dbus.SystemBus()
     mainloop = GObject.MainLoop()
     #Instantiated apps that hold one or more Service
-    apps = AppServices(bus)
+    apps = AppServices(mainloop,bus)
 
     #Instantitated Service that hold characteristics
     deviceStatusService = Service(apps.bus, apps.next_index, uuidConstant.statusCharacteristicsUUID, False)
     
     #Instantiated Characteristics of service
-    lockCharacteristic = lockStatus(apps.bus,1,"",[None],deviceStatusService)
-    deviceOwnerShip = deviceOwner(apps.bus,2,"",[None],deviceStatusService)
+    lockCharacteristic = lockStatus(apps.bus,1,uuidConstant.customOneUUID,["Read"],deviceStatusService)
+    deviceOwnerShip = deviceOwner(apps.bus,2,uuidConstant.customTwoUUID,["Read"],deviceStatusService)
     deviceStatusService.add_characteristic(lockCharacteristic)
     deviceStatusService.add_characteristic(deviceOwnerShip)
 
     #Register AppServices that hold multiple service
     apps.add_service(deviceStatusService)
+    print(apps.get_path())
+    apps.register()
     apps.run()
     #apps.quit()
 main()
