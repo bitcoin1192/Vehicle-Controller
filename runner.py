@@ -20,8 +20,9 @@ def main():
 def watchDogs(processList):
     while(True):
         for process in processList:
+            process.poll()
             print(process.returncode)
-            if process.returncode and process.returncode != 0:
+            if process.returncode:
                 print("Something happen to subprocess")
                 raise KeyboardInterrupt
         sleep(2)
