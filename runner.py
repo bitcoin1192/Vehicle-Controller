@@ -2,11 +2,12 @@ import subprocess
 from time import sleep
 
 currentDir = "/home/pi/final-skripsi/"
+pythonExec = "python3"
 def main():
-    relayProcess = subprocess.Popen(currentDir+"RelayControl.py")
-    detectorProcess = subprocess.Popen(currentDir+"helmetAnnouncer.py")
-    authenticatorProcess = subprocess.Popen(currentDir+"bluetoothVerifier.py")
-    processList = [relayProcess,detectorProcess,authenticatorProcess]
+    relayProcess = subprocess.Popen([pythonExec,currentDir+"RelayControl.py"])
+    detectorProcess = subprocess.Popen([pythonExec,currentDir+"helmetAnnouncer.py"])
+    #authenticatorProcess = subprocess.Popen([pythonExec,currentDir+"bluetoothVerifier.py"])
+    processList = [relayProcess,detectorProcess] #authenticatorProcess]
     try:
         watchDogs(processList)
     except KeyboardInterrupt:
@@ -19,6 +20,10 @@ def main():
 def watchDogs(processList):
     while(True):
         for process in processList:
-            if process.stderr:
+            print(process.returncode)
+            if process.returncode and process.returncode != 0:
+                print("Something happen to subprocess")
                 raise KeyboardInterrupt
         sleep(2)
+
+main()
