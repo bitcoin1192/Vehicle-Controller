@@ -154,6 +154,9 @@ class HelmetDetector:
         #Data Type Conversion to convert 2D array to tf array needed by model
         return self._dataTypeConversion(FlattenFFT)
 
+    def blackCenteredFrame():
+        pass
+
     def runPrediction(self):
         faceImage = self.FaceDetection.getFace()
         cannyImage = self.FaceDetection.getCanny()
