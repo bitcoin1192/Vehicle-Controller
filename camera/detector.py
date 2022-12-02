@@ -208,3 +208,4 @@ class HelmetDetector:
     def resetCounter(self):
         self.counter = 0
         self.tallyCounter = np.zeros(2)
+        self.currentHelmetStatus = False
