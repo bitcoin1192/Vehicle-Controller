@@ -20,7 +20,7 @@ def main():
     deviceStatusService = Service(apps.bus, apps.next_index, uuidConstant.statusCharacteristicsUUID, True)
     
     #Instantiated Characteristics of service
-    lockCharacteristic = lockStatus(apps.bus,1,uuidConstant.customOneUUID,["read"],deviceStatusService)
+    lockCharacteristic = lockStatus(apps.bus,1,uuidConstant.customOneUUID,["read","write"],deviceStatusService)
     deviceOwnerShip = deviceOwner(apps.bus,2,uuidConstant.customTwoUUID,["read"],deviceStatusService)
     deviceStatusService.add_characteristic(lockCharacteristic)
     deviceStatusService.add_characteristic(deviceOwnerShip)
