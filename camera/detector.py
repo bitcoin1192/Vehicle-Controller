@@ -199,7 +199,7 @@ class HelmetDetector:
         self.counter += 1
         return self.currentHelmetStatus
 
-    def _makeDecision(self,tally):
+    def _makeDecision(self):
         if self.tallyCounter[0] < self.tallyCounter[1]:
             self.currentHelmetStatus = False
         else:
