@@ -26,6 +26,8 @@ def main():
                 Controller.HelmetStatus(result)
             else:
                 print("Pausing helmet detection: BluetoothKey is not verified")
+                hd.counter = 0
+                hd.resetCounter()
                 time.sleep(1)
     except GLib.Error as err:
         print("Complementary program exitting")

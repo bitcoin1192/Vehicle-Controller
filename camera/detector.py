@@ -194,8 +194,7 @@ class HelmetDetector:
     def tallyResult(self):
         if self.counter == self.sampleNeeded:
             self._makeDecision()
-            self.counter = 0
-            self.tallyCounter = np.zeros(2)
+            self.resetCounter()
         else:
             self.detectHelmet()
         return self.currentHelmetStatus
@@ -205,3 +204,7 @@ class HelmetDetector:
             self.currentHelmetStatus = False
         else:
             self.currentHelmetStatus = True
+
+    def resetCounter(self):
+        self.counter = 0
+        self.tallyCounter = np.zeros(2)
