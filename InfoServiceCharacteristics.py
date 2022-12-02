@@ -16,13 +16,16 @@ class lockStatus(gattCharacteristics):
         for byte in value:
             self.buf = self.buf+ chr(byte)
             print(self.buf)
-        #if value:
-        #    print(dbus.String(value[0]))
-        #    self.buf.append(dbus.String(value[0]))
-        #print(self.buf)
+        if self.buf == "unlock":
+            self.current_status = UNLOCKED
+        elif self.buf == "lock":
+            self.current_status = LOCKED
         
     def ReadValue(self, options):
-        return [dbus.Boolean(self.current_status)]
+        if self.current_status == UNLOCKED:
+            return [dbus.String("Vehicle is Unlocked")]
+        elif self.current_status == LOCKED:
+            return [dbus.String("Vehicle is Locked")]
 
 class deviceOwner(gattCharacteristics):
     uniqueOwner = 20
