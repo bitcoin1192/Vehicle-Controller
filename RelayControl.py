@@ -53,7 +53,7 @@ class RelayLogic:
             self.pixels = neopixel.NeoPixel(board.D18, 1)
         self.RelayState = RELAYOFF
         self._helmetDetected = False
-        self._bluetoothKeyVerified = True
+        self._bluetoothKeyVerified = False
         Pin.setmode(Pin.BCM)
         Pin.setup(RelayPin, Pin.OUT)
         self.stateAction()

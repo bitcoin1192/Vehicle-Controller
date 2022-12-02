@@ -6,6 +6,7 @@ pythonExec = "python3"
 def main():
     relayProcess = subprocess.Popen([pythonExec,currentDir+"RelayControl.py"])
     detectorProcess = subprocess.Popen([pythonExec,currentDir+"helmetAnnouncer.py"])
+    sleep(3)
     authenticatorProcess = subprocess.Popen([pythonExec,currentDir+"bluetoothVerifier.py"])
     processList = [relayProcess,detectorProcess,authenticatorProcess]
     try:
