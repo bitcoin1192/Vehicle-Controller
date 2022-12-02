@@ -26,7 +26,7 @@ class lockStatus(gattCharacteristics):
             self.current_status = UNLOCKED
         elif self.buf == "lack" or self.buf == "a":
             print("Locking")
-            self.relayControl.BluetoothKeyStatus(True)
+            self.relayControl.BluetoothKeyStatus(False)
             self.current_status = LOCKED
         self.buf = ""
 
