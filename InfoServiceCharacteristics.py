@@ -20,6 +20,9 @@ class lockStatus(gattCharacteristics):
             self.current_status = UNLOCKED
         elif self.buf == "lock":
             self.current_status = LOCKED
+        else:
+            self.buf = ""
+            return [dbus.String("Weird message")]
         
     def ReadValue(self, options):
         if self.current_status == UNLOCKED:
