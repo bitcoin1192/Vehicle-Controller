@@ -16,16 +16,16 @@ except ModuleNotFoundError:
 def main():
     td = detector.ImageProcessor(selectCamera(0))
     fd = detector.FaceDetector(td,128,128,1.7)
-    hd = detector.HelmetDetector(fd,0.7)
+    hd = detector.HelmetDetector(fd,0.7,6)
     Controller = bus.get("com.sisalma.pydbus")
     try:
         while(True):
-            if Controller.bluetoothKeyVerified:
-                result = hd.helmetUsed(6)
+            if Controller.bluetoothKeyVerified == True:
+                result = hd.tallyResult()
                 print(result)
                 Controller.HelmetStatus(result)
             else:
-                print("Won't run: BluetoothKey is not verified")
+                print("Pausing helmet detection: BluetoothKey is not verified")
                 time.sleep(1)
     except GLib.Error as err:
         print("Complementary program exitting")

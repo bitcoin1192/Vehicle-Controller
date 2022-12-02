@@ -114,10 +114,14 @@ class FaceDetector:
 
 
 class HelmetDetector:
-    def __init__(self, FaceDetector, ConfidenceThreshold) -> None:        
+    def __init__(self, FaceDetector, ConfidenceThreshold, SampleNeeded) -> None:        
         #Set tflite model and it's input and output details
+        self.sampleNeeded = SampleNeeded
         self.confidence = ConfidenceThreshold
         self.FaceDetection = FaceDetector
+        self.currentHelmetStatus = False
+        self.counter = 0
+        self.tallyCounter = np.zeros(2)
         self.interpreter = tf.lite.Interpreter(tflitePath)
         self.interpreter.allocate_tensors()
         self.input_details = self.interpreter.get_input_details()
@@ -173,23 +177,30 @@ class HelmetDetector:
             output_data = output_data/255
             return output_data
     
-    def helmetUsed(self, sample):
-        tally = np.zeros(2)
-        i = 0
-        while(i < sample):
-            output_data = self.runPrediction()
-            if output_data is not None:
-                if output_data[0][0] > self.confidence:
-                    plus = np.array([1,0])
-                    tally = np.add(tally,plus)
-                    txtPrintImg = ["Helmet Detected",(0,255,0)]
-                    i += 1
-                elif output_data[0][1] > self.confidence:
-                    plus = np.array([0,1])
-                    tally = np.add(tally,plus)
-                    txtPrintImg = ["Helmet not Detected",(0,0,255)]
-                    i += 1
-        if tally[0]<tally[1]:
-            return False
+    def detectHelmet(self):
+        output_data = self.runPrediction()
+        if output_data is not None:
+            if output_data[0][0] > self.confidence:
+                plus = np.array([1,0])
+                tally = np.add(self.tallyCounter,plus)
+                txtPrintImg = ["Helmet Detected",(0,255,0)]
+            elif output_data[0][1] > self.confidence:
+                plus = np.array([0,1])
+                tally = np.add(self.tallyCounter,plus)
+                txtPrintImg = ["Helmet not Detected",(0,0,255)]
+        
+    def tallyResult(self):
+        if self.counter == self.sampleNeeded:
+            self._makeDecision()
+            self.counter = 0
+            self.tallyCounter = np.zeros(2)
         else:
-            return True
+            self.detectHelmet()
+        self.counter += 1
+        return self.currentHelmetStatus
+
+    def _makeDecision(self,tally):
+        if self.tallyCounter[0] < self.tallyCounter[1]:
+            self.currentHelmetStatus = False
+        else:
+            self.currentHelmetStatus = True
