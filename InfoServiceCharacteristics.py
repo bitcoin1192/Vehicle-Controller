@@ -6,7 +6,7 @@ from bluezdbusInterface.interfaceConstant import *
 
 class lockStatus(gattCharacteristics):
     def __init__(self, bus, index, uuid, flags, service):
-        self.current_status = UNLOCKED
+        self.current_status = LOCKED
         self.buf = ""
         super().__init__(bus, index, uuid, flags, service)
 
@@ -15,22 +15,30 @@ class lockStatus(gattCharacteristics):
 
     def WriteValue(self, value, options):
         for byte in value:
-            self.buf = self.buf+ chr(byte)
+            self.buf = self.buf + chr(byte)
             print(self.buf)
-        if self.buf == "unlock":
+        if self.buf == "unlock" or self.buf == "u":
+            print("Poin")
             self.current_status = UNLOCKED
-        elif self.buf == "lock":
+        elif self.buf == "lack" or self.buf == "a":
+            print("NoPoin")
             self.current_status = LOCKED
+        self.buf = ""
 
     @dbus.service.method(GATT_CHRC_IFACE,
                         in_signature='a{sv}',
-                        out_signature='s')    
+                        out_signature='ay')    
     def ReadValue(self, options):
+        temp = ""
+        msg = []
         print("Request")
         if self.current_status == UNLOCKED:
-            return dbus.String("Vehicle is Unlocked")
+           temp = "Vehicle is Unlocked"
         elif self.current_status == LOCKED:
-            return dbus.String("Vehicle is Locked")
+           temp = "Vehicle is Locked"
+        for char in temp:
+            msg.append(ord(char))
+        return msg
 
 class deviceOwner(gattCharacteristics):
     uniqueOwner = 20
