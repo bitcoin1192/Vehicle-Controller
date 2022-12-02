@@ -1,6 +1,7 @@
 import dbus
 from bluezdbusInterface.gattCharacteristics import Characteristic as gattCharacteristics
 from uuidConstant import *
+from bluezdbusInterface.interfaceConstant import *
 
 
 class lockStatus(gattCharacteristics):
@@ -20,15 +21,16 @@ class lockStatus(gattCharacteristics):
             self.current_status = UNLOCKED
         elif self.buf == "lock":
             self.current_status = LOCKED
-        else:
-            self.buf = ""
-            return [dbus.String("Weird message")]
-        
+
+    @dbus.service.method(GATT_CHRC_IFACE,
+                        in_signature='a{sv}',
+                        out_signature='s')    
     def ReadValue(self, options):
+        print("Request")
         if self.current_status == UNLOCKED:
-            return [dbus.String("Vehicle is Unlocked")]
+            return dbus.String("Vehicle is Unlocked")
         elif self.current_status == LOCKED:
-            return [dbus.String("Vehicle is Locked")]
+            return dbus.String("Vehicle is Locked")
 
 class deviceOwner(gattCharacteristics):
     uniqueOwner = 20
