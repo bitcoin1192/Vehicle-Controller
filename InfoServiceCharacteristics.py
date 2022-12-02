@@ -13,8 +13,8 @@ class lockStatus(gattCharacteristics):
         self.current_status = lockUpdate
 
     def WriteValue(self, value, options):
+        print(value)
         if value == '\0':
-            print()
             self.buf == ""
         else:
             self.buf += value
