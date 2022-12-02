@@ -26,6 +26,7 @@ RELAYON = 0
 RELAYOFF = 1
 
 LEDGREEN = (0,255,12)
+LEDBLUE = (12,0,255)
 LEDRED = (255,12,0)
 LEDOFF = (0,0,0)
 
@@ -74,21 +75,22 @@ class RelayLogic:
     def lockUnlockIO(self):
         if self._bluetoothKeyVerified and self._helmetDetected:
             self.RelayState = RELAYON
+            self.changeLEDColor(LEDGREEN)
         elif self._bluetoothKeyVerified and not self._helmetDetected:
+            self.changeLEDColor(LEDBLUE)
             self.RelayState = RELAYOFF
         elif not self._bluetoothKeyVerified :
             self.RelayState = RELAYOFF
+            self.changeLEDColor(LEDRED)
             #Send signal to stop detecting helmet on other script listening
             self.PropertiesChanged(busName, {"bluetoothKeyVerified": self._bluetoothKeyVerified}, [])
         self.stateAction()
         
     def stateAction(self):
         if self.RelayState == RELAYON:
-            self.changeLEDColor(LEDGREEN)
             Pin.output(RelayPin,Pin.HIGH)
             print("Relay state changes to: ON")
         elif self.RelayState == RELAYOFF:
-            self.changeLEDColor(LEDRED)
             Pin.output(RelayPin,Pin.LOW)
             print("Relay state changes to: OFF")
         
