@@ -2,12 +2,15 @@ import dbus
 from bluezdbusInterface.gattCharacteristics import Characteristic as gattCharacteristics
 from uuidConstant import *
 from bluezdbusInterface.interfaceConstant import *
+from pydbus import SystemBus
 
 
 class lockStatus(gattCharacteristics):
     def __init__(self, bus, index, uuid, flags, service):
         self.current_status = LOCKED
         self.buf = ""
+        self.otherbus = SystemBus()
+        self.relayControl = self.otherbus.get("com.sisalma.pydbus")
         super().__init__(bus, index, uuid, flags, service)
 
     def statusUpdate(self,lockUpdate):
@@ -18,10 +21,12 @@ class lockStatus(gattCharacteristics):
             self.buf = self.buf + chr(byte)
             print(self.buf)
         if self.buf == "unlock" or self.buf == "u":
-            print("Poin")
+            print("Unlocking")
+            self.relayControl.BluetoothKeyStatus(True)
             self.current_status = UNLOCKED
         elif self.buf == "lack" or self.buf == "a":
-            print("NoPoin")
+            print("Locking")
+            self.relayControl.BluetoothKeyStatus(True)
             self.current_status = LOCKED
         self.buf = ""
 
