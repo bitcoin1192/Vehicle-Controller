@@ -13,11 +13,13 @@ class lockStatus(gattCharacteristics):
         self.current_status = lockUpdate
 
     def WriteValue(self, value, options):
-        print(value)
-        if value == '\0':
-            self.buf == ""
-        else:
-            self.buf += value
+        for byte in value:
+            self.buf = self.buf+ chr(byte)
+            print(self.buf)
+        #if value:
+        #    print(dbus.String(value[0]))
+        #    self.buf.append(dbus.String(value[0]))
+        #print(self.buf)
         
     def ReadValue(self, options):
         return [dbus.Boolean(self.current_status)]
