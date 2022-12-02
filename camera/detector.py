@@ -188,6 +188,8 @@ class HelmetDetector:
                 plus = np.array([0,1])
                 tally = np.add(self.tallyCounter,plus)
                 txtPrintImg = ["Helmet not Detected",(0,0,255)]
+            self.counter += 1
+
         
     def tallyResult(self):
         if self.counter == self.sampleNeeded:
@@ -196,7 +198,6 @@ class HelmetDetector:
             self.tallyCounter = np.zeros(2)
         else:
             self.detectHelmet()
-        self.counter += 1
         return self.currentHelmetStatus
 
     def _makeDecision(self):
