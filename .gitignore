@@ -6,3 +6,5 @@
 final-skripsi.code-workspace
 camera/__pycache__
 __pycache__
+bluezdbusInterface/__pycache__
+logs.log
