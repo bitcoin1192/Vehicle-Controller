@@ -97,7 +97,9 @@ class FaceDetector:
         cannyImage = []
         if len(self.tempImage) != 0:
             for image in self.tempImage:
+                temp = cv2.Canny(image,t1,t2)
                 cannyImage.append(cv2.Canny(image,t1,t2))
+                self.debug(temp)
         return cannyImage
     
     def calculatePixelLocation(self, x,y,w,h):
@@ -120,6 +122,7 @@ class HelmetDetector:
         self.confidence = ConfidenceThreshold
         self.FaceDetection = FaceDetector
         self.currentHelmetStatus = False
+        self.stopFlag = False
         self.counter = 0
         self.tallyCounter = np.zeros(2)
         self.interpreter = tf.lite.Interpreter(tflitePath)
@@ -192,19 +195,27 @@ class HelmetDetector:
 
         
     def tallyResult(self):
-        if self.counter == self.sampleNeeded:
+        if self.counter >= self.sampleNeeded:
             self._makeDecision()
             self.resetCounter()
         else:
             self.detectHelmet()
+        self.stopFlag = False
         return self.currentHelmetStatus
 
     def _makeDecision(self):
-        if self.tallyCounter[0] < self.tallyCounter[1]:
-            self.currentHelmetStatus = False
+        if self.stopFlags != True:
+            if self.tallyCounter[0] < self.tallyCounter[1]:
+                self.currentHelmetStatus = False
+            else:
+                self.currentHelmetStatus = True
         else:
-            self.currentHelmetStatus = True
+            self.currentHelmetStatus = False
 
     def resetCounter(self):
         self.counter = 0
         self.tallyCounter = np.zeros(2)
+
+    def stopFlags():
+        self.stopFlag = True
+        self.resetCounter()

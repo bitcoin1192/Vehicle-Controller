@@ -26,6 +26,6 @@ def watchDogs(processList):
             if process.returncode:
                 print("Something happen to subprocess")
                 raise KeyboardInterrupt
-        sleep(2)
+            sleep(2)
 
 main()

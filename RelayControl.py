@@ -57,7 +57,7 @@ class RelayLogic:
         self._bluetoothKeyVerified = False
         Pin.setmode(Pin.BCM)
         Pin.setup(RelayPin, Pin.OUT)
-        self.stateAction()
+        self.lockUnlockIO()
         
 
     def BluetoothKeyStatus(self, s):
