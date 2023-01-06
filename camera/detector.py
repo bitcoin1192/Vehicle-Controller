@@ -215,11 +215,7 @@ class HelmetDetector:
     def resetCounter(self):
         self.counter = 0
         self.tallyCounter = np.zeros(2)
-<<<<<<< HEAD
 
-    def stopFlags():
+    def stopFlags(self):
         self.stopFlag = True
         self.resetCounter()
-=======
-        self.currentHelmetStatus = False
->>>>>>> 40117fe66f507133cdb383da062dc102eeedec3a
