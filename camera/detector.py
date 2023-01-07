@@ -208,6 +208,7 @@ class HelmetDetector:
             self.currentHelmetStatus = False
         else:
             self.currentHelmetStatus = True
+        print(self.tallyCounter)
 
     def resetCounter(self):
         self.counter = 0
@@ -215,4 +216,3 @@ class HelmetDetector:
 
     def stopFlags(self, input):
         self.stopFlag = input
-        self.resetCounter()
