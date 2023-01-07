@@ -200,7 +200,6 @@ class HelmetDetector:
             self.resetCounter()
         else:
             self.detectHelmet()
-        self.stopFlag = False
         return self.currentHelmetStatus
 
     def _makeDecision(self):

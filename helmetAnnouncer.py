@@ -16,11 +16,12 @@ except ModuleNotFoundError:
 def main():
     td = detector.ImageProcessor(selectCamera(0))
     fd = detector.FaceDetector(td,128,128,1.7)
-    hd = detector.HelmetDetector(fd,0.7,6)
+    hd = detector.HelmetDetector(fd,0.7,4)
     Controller = bus.get("com.sisalma.pydbus")
     try:
         while(True):
             if Controller.bluetoothKeyVerified == True:
+                hd.stopFlag = True
                 result = hd.tallyResult()
                 print(result)
                 Controller.HelmetStatus(result)
