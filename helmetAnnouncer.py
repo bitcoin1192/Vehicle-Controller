@@ -21,14 +21,14 @@ def main():
     try:
         while(True):
             if Controller.bluetoothKeyVerified == True:
-                hd.stopFlag = True
-                result = hd.tallyResult()
-                print(result)
-                Controller.HelmetStatus(result)
+                hd.stopFlags(True)
             else:
                 print("Pausing helmet detection: BluetoothKey is not verified")
-                hd.stopFlags()
+                hd.stopFlags(False)
                 time.sleep(1)
+            result = hd.tallyResult()
+            print(result)
+            Controller.HelmetStatus(result)
     except GLib.Error as err:
         print("Complementary program exitting")
 main()
