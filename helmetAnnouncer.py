@@ -21,10 +21,10 @@ def main():
     try:
         while(True):
             if Controller.bluetoothKeyVerified == True:
-                hd.stopFlags(True)
+                hd.stopFlags(False)
             else:
                 print("Pausing helmet detection: BluetoothKey is not verified")
-                hd.stopFlags(False)
+                hd.stopFlags(True)
                 time.sleep(1)
             result = hd.tallyResult()
             print(result)
