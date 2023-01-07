@@ -216,4 +216,5 @@ class HelmetDetector:
 
     def stopFlags(self, input):
         self.stopFlag = input
-        self.currentHelmetStatus = False
+        if(self.stopFlag == True):
+            self.currentHelmetStatus = False
