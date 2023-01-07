@@ -185,11 +185,11 @@ class HelmetDetector:
         if output_data is not None:
             if output_data[0][0] > self.confidence:
                 plus = np.array([1,0])
-                tally = np.add(self.tallyCounter,plus)
+                self.tallyCounter = np.add(self.tallyCounter,plus)
                 txtPrintImg = ["Helmet Detected",(0,255,0)]
             elif output_data[0][1] > self.confidence:
                 plus = np.array([0,1])
-                tally = np.add(self.tallyCounter,plus)
+                self.tallyCounter = np.add(self.tallyCounter,plus)
                 txtPrintImg = ["Helmet not Detected",(0,0,255)]
             self.counter += 1
 
