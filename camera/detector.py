@@ -195,7 +195,7 @@ class HelmetDetector:
 
         
     def tallyResult(self):
-        if self.stopFlags != True:
+        if self.stopFlags == False:
             if self.counter >= self.sampleNeeded:
                 self._makeDecision()
                 self.resetCounter()
