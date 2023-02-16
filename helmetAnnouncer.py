@@ -15,7 +15,7 @@ except ModuleNotFoundError:
 
 def main():
     vidcap = VideoCapture(0)
-    time.sleep(1000)
+    time.sleep(5000)
     if vidcap.isOpened() is True:
         td = detector.ImageProcessor(VideoCapture(0))
         fd = detector.FaceDetector(td,128,128,1.7)
