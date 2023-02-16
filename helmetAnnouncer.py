@@ -28,7 +28,7 @@ def main():
                     print("Pausing helmet detection: BluetoothKey is not verified")
                     hd.stopFlags(True)
                     hd.resetCounter()
-                    time.sleep(1)
+                    time.sleep(0.5)
                 result = hd.tallyResult()
                 print(result)
                 Controller.HelmetStatus(result)
