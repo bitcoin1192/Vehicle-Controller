@@ -187,10 +187,12 @@ class HelmetDetector:
                 plus = np.array([1,0])
                 self.tallyCounter = np.add(self.tallyCounter,plus)
                 txtPrintImg = ["Helmet Detected",(0,255,0)]
+                print(txtPrintImg[0]) 
             elif output_data[0][1] > self.confidence:
                 plus = np.array([0,1])
                 self.tallyCounter = np.add(self.tallyCounter,plus)
                 txtPrintImg = ["Helmet not Detected",(0,0,255)]
+                print(txtPrintImg[0])
             self.counter += 1
 
         
@@ -218,3 +220,4 @@ class HelmetDetector:
         self.stopFlag = input
         if(self.stopFlag == True):
             self.currentHelmetStatus = False
+
