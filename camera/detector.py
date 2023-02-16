@@ -46,6 +46,7 @@ class ImageProcessor:
             print("Retrying to fetch image %d" % retry)
         self.vid.release()
         raise Exception("Failed to fetch image from camera")
+        
     def ImagePreProcessing(self):
         #Convert camera input to opencv gray output
         inputImage = self.__getImage()
