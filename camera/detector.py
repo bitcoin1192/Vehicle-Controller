@@ -35,7 +35,7 @@ class ImageProcessor:
         while(retry < 5):
             ret, frame = self.vid.read()
             time.sleep(0.2)
-            #self.debug()
+            self.debug()
             if type(frame) != None or ret == True:
                 x,y,w,h = self.roi
                 dst = cv2.undistort(frame, self.mtxconst, self.distconst, None, self.newcameramtx)
