@@ -37,5 +37,4 @@ def main():
             print("Complementary program exitting")
     else:
         print("Camera not found or timeout")
-        raise Exception("Camera not found or timeout")
 main()
