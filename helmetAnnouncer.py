@@ -30,8 +30,11 @@ def main():
                     hd.resetCounter()
                     time.sleep(0.5)
                 result = hd.tallyResult()
-                print(result)
-                Controller.HelmetStatus(result)
+                if result == None:
+                    print("Detection not started")
+                else:
+                    print(result)
+                    Controller.HelmetStatus(result)
         except GLib.Error as err:
             print("Complementary program exitting")
     else:
