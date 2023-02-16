@@ -31,19 +31,20 @@ class ImageProcessor:
         self.tic = 0
 
     def __getImage(self):
-        ret, frame = self.vid.read()
-        self.debug()
-        if type(frame) == None or ret != True:
-            #Spew no image captured error
-            pass
-        else:
-            #Flip in x axis
-            x,y,w,h = self.roi
-            dst = cv2.undistort(frame, self.mtxconst, self.distconst, None, self.newcameramtx)
-            dst = dst[y:y+h,x:x+w]
-            frame = cv2.flip(dst,0)
-            #frame = dst
-            return frame
+        retry = 0
+        while(retry < 5):
+            ret, frame = self.vid.read()
+            time.sleep(0.2)
+            #self.debug()
+            if type(frame) != None or ret == True:
+                x,y,w,h = self.roi
+                dst = cv2.undistort(frame, self.mtxconst, self.distconst, None, self.newcameramtx)
+                dst = dst[y:y+h,x:x+w]
+                frame = cv2.flip(dst,0)
+                #frame = dst
+                return frame
+            retry += 1                
+        raise Exception("No image captured after 5 attempts")
 
     def ImagePreProcessing(self):
         #Convert camera input to opencv gray output
