@@ -43,9 +43,8 @@ class ImageProcessor:
                 #frame = dst
                 return frame
             retry += 1
-            time.sleep(0.2)
             print("Retrying to fetch image %d" % retry)                
-        raise None
+        raise Exception("Failed to fetch image from camera")
     def ImagePreProcessing(self):
         #Convert camera input to opencv gray output
         inputImage = self.__getImage()

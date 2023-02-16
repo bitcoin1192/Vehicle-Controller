@@ -26,7 +26,7 @@ def watchDogs(processList):
             if process.returncode:
                 print("Something happen to subprocess")
                 raise KeyboardInterrupt
-            print("Checking process")
+            print("Checking process %s".format(process.pid))
             sleep(2)
 
 main()
