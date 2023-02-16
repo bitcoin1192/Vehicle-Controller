@@ -48,7 +48,8 @@ class ImageProcessor:
         raise None
     def ImagePreProcessing(self):
         #Convert camera input to opencv gray output
-        gray = cv2.cvtColor(self.__getImage(), cv2.COLOR_RGB2GRAY)
+        inputImage = self.__getImage()
+        gray = cv2.cvtColor(inputImage, cv2.COLOR_RGB2GRAY)
         return gray
         #Normalize gray frame
         #norm = cv2.normalize(gray,norm,0,255,cv2.NORM_MINMAX)
