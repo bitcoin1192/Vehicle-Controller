@@ -34,9 +34,8 @@ class ImageProcessor:
         retry = 0
         while(retry < 5):
             ret, frame = self.vid.read()
-            time.sleep(0.2)
             self.debug()
-            if type(frame) != None or ret == True:
+            if type(frame) != None and ret == True:
                 x,y,w,h = self.roi
                 dst = cv2.undistort(frame, self.mtxconst, self.distconst, None, self.newcameramtx)
                 dst = dst[y:y+h,x:x+w]
@@ -44,6 +43,7 @@ class ImageProcessor:
                 #frame = dst
                 return frame
             retry += 1
+            time.sleep(0.2)
             print("Retrying to fetch image %d" % retry)                
         raise None
     def ImagePreProcessing(self):
