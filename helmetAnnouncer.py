@@ -15,9 +15,8 @@ except ModuleNotFoundError:
 
 def main():
     vidcap = VideoCapture(0)
-    time.sleep(5000)
     if vidcap.isOpened() is True:
-        td = detector.ImageProcessor(VideoCapture(0))
+        td = detector.ImageProcessor(vidcap)
         fd = detector.FaceDetector(td,128,128,1.7)
         hd = detector.HelmetDetector(fd,0.7,4)
         Controller = bus.get("com.sisalma.pydbus")
