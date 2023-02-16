@@ -1,6 +1,6 @@
 from pydbus import SessionBus, SystemBus
 from camera import detector
-from cv2 import VideoCapture as selectCamera
+from cv2 import VideoCapture
 from gi.repository import GLib
 import time
 try:
@@ -14,22 +14,27 @@ except ModuleNotFoundError:
 
 
 def main():
-    td = detector.ImageProcessor(selectCamera(0))
-    fd = detector.FaceDetector(td,128,128,1.7)
-    hd = detector.HelmetDetector(fd,0.7,4)
-    Controller = bus.get("com.sisalma.pydbus")
-    try:
-        while(True):
-            if Controller.bluetoothKeyVerified == True:
-                hd.stopFlags(False)
-            else:
-                print("Pausing helmet detection: BluetoothKey is not verified")
-                hd.stopFlags(True)
-                hd.resetCounter()
-                time.sleep(1)
-            result = hd.tallyResult()
-            print(result)
-            Controller.HelmetStatus(result)
-    except GLib.Error as err:
-        print("Complementary program exitting")
+    vidcap = VideoCapture(0)
+    time.sleep(1000)
+    if vidcap.isOpened() is True:
+        td = detector.ImageProcessor(VideoCapture(0))
+        fd = detector.FaceDetector(td,128,128,1.7)
+        hd = detector.HelmetDetector(fd,0.7,4)
+        Controller = bus.get("com.sisalma.pydbus")
+        try:
+            while(True):
+                if Controller.bluetoothKeyVerified == True:
+                    hd.stopFlags(False)
+                else:
+                    print("Pausing helmet detection: BluetoothKey is not verified")
+                    hd.stopFlags(True)
+                    hd.resetCounter()
+                    time.sleep(1)
+                result = hd.tallyResult()
+                print(result)
+                Controller.HelmetStatus(result)
+        except GLib.Error as err:
+            print("Complementary program exitting")
+    else:
+        print("Camera not found or timeout")
 main()
