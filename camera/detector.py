@@ -43,9 +43,9 @@ class ImageProcessor:
                 frame = cv2.flip(dst,0)
                 #frame = dst
                 return frame
-            retry += 1                
-        raise Exception("No image captured after 5 attempts")
-
+            retry += 1
+            print("Retrying to fetch image %d" % retry)                
+        raise None
     def ImagePreProcessing(self):
         #Convert camera input to opencv gray output
         gray = cv2.cvtColor(self.__getImage(), cv2.COLOR_RGB2GRAY)
