@@ -11,7 +11,7 @@ t2 = 255/2
 #matrixCalibPath = "/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/mtx.correction.npy"
 #distortionCalibPath = "/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/dist.correction.npy"
 cvHaarPath = "/home/pi/final-skripsi/camera/haar_alt"
-tflitePath = "/home/pi/final-skripsi/camera/model-relu-3.tflite"
+tflitePath = "/home/pi/final-skripsi/camera/model-relu-3-test.tflite"
 matrixCalibPath = "/home/pi/final-skripsi/camera/mtx.correction.npy"
 distortionCalibPath = "/home/pi/final-skripsi/camera/dist.correction.npy"
 
@@ -147,13 +147,13 @@ class HelmetDetector:
 
     def _dataTypeConversion(self, OneDInput):
         #Transpose input array needed for prediction
-        inputframe = np.reshape(OneDInput,(1,8192,))
+        inputframe = np.reshape(OneDInput,(1,128,128,1))
         #Check if the inputframe type is quantized, then rescale inputframe data to uint8
-        if self.input_details[0]['dtype'] == np.uint8:
-            input_scale, input_zero_point = self.input_details[0]["quantization"]
-            inputframe = inputframe / input_scale + input_zero_point
+        #if self.input_details[0]['dtype'] == np.uint8:
+        #    input_scale, input_zero_point = self.input_details[0]["quantization"]
+        #    inputframe = inputframe / input_scale + input_zero_point
         #Return unsigned int8 one dimensional array
-        return np.array(inputframe, dtype=np.uint8)
+        return np.array(inputframe, dtype=np.float32)
 
     def _predictionPreProcess(self,inputFrame):
         #FFT with thresholding process
@@ -167,7 +167,7 @@ class HelmetDetector:
     def runPrediction(self):
         faceImage = self.FaceDetection.getFace()
         cannyImage = self.FaceDetection.getCanny()
-        for face in cannyImage:
+        for face in faceImage:
             self.debug(faceImage[0],face)
             input_data = self._predictionPreProcess(face)
             self.interpreter.set_tensor(self.input_details[0]['index'], input_data)
@@ -177,7 +177,7 @@ class HelmetDetector:
             # Use `tensor()` in order to get a pointer to the tensor.
             output_data = self.interpreter.get_tensor(self.output_details[0]['index'])
             # As per tensorflow documentation for model with quantize output 
-            output_data = output_data/255
+            output_data = output_data
             return output_data
     
     def detectHelmet(self):
