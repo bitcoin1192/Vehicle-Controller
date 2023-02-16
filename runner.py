@@ -11,7 +11,7 @@ def main():
     processList = [relayProcess,detectorProcess,authenticatorProcess]
     try:
         watchDogs(processList)
-    except KeyboardInterrupt:
+    except KeyboardInterrupt or Exception:
         for process in processList:
             print("Terminating process {}".format(process.pid))
             process.terminate()
