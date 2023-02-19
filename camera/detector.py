@@ -2,7 +2,8 @@ from math import ceil, floor
 import time
 import numpy as np
 import cv2
-import tensorflow as tf
+#import tensorflow as tf
+import tflite_runtime.interpreter as tflite
 
 t1 = 255/3
 t2 = 255/2
@@ -11,7 +12,7 @@ t2 = 255/2
 #matrixCalibPath = "/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/mtx.correction.npy"
 #distortionCalibPath = "/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/dist.correction.npy"
 cvHaarPath = "/home/pi/final-skripsi/camera/haar_alt"
-tflitePath = "/home/pi/final-skripsi/camera/model-relu-3-test.tflite"
+tflitePath = "/home/pi/final-skripsi/camera/model-tanh-5-test.tflite"
 matrixCalibPath = "/home/pi/final-skripsi/camera/mtx.correction.npy"
 distortionCalibPath = "/home/pi/final-skripsi/camera/dist.correction.npy"
 
@@ -23,10 +24,11 @@ class ImageProcessor:
         self.vid = CVCaptureDevice
         self.vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
         self.vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+        self.vid.set(cv2.CAP_PROP_AUTO_EXPOSURE, 1)
         self.mtxconst = np.load(matrixCalibPath)
         self.distconst = np.load(distortionCalibPath)
         self.newcameramtx, self.roi = cv2.getOptimalNewCameraMatrix(self.mtxconst, self.distconst, (1280,720), 1, (1280,720))
-        self.debugFlag = True
+        self.debugFlag = False
         self.toc = 0
         self.tic = 0
 
@@ -35,11 +37,12 @@ class ImageProcessor:
         while(retry < 5):
             ret, frame = self.vid.read()
             self.debug()
-            if frame != None and ret == True:
+            if ret == True:
                 x,y,w,h = self.roi
                 dst = cv2.undistort(frame, self.mtxconst, self.distconst, None, self.newcameramtx)
                 dst = dst[y:y+h,x:x+w]
                 frame = cv2.flip(dst,0)
+#                print("Reading camera")
                 #frame = dst
                 return frame
             retry += 1
@@ -50,7 +53,9 @@ class ImageProcessor:
     def ImagePreProcessing(self):
         #Convert camera input to opencv gray output
         inputImage = self.__getImage()
+        norm = np.zeros((128,128))
         gray = cv2.cvtColor(inputImage, cv2.COLOR_RGB2GRAY)
+        norm = cv2.normalize(gray,norm,0,255,cv2.NORM_MINMAX)
         return gray
         #Normalize gray frame
         #norm = cv2.normalize(gray,norm,0,255,cv2.NORM_MINMAX)
@@ -78,8 +83,9 @@ class FaceDetector:
     
     def getFace(self):
         grayImage = self.ImgProcess.ImagePreProcessing()
+        #self.debug(grayImage)
         faceImage = []
-        facePosition = self.face_cascade.detectMultiScale(grayImage, scaleFactor=1.3, minNeighbors=1)
+        facePosition = self.face_cascade.detectMultiScale(grayImage, scaleFactor=1.3, minNeighbors=2)
         for faceCoordinate in facePosition:
             x,y,width,height = faceCoordinate
             if width < self.minPixelSize:
@@ -92,6 +98,7 @@ class FaceDetector:
                 else:
                     print("Detecting face")
                     resizeImage = cv2.resize(grayImage[start[1]:end[1],start[0]:end[0]],(128,128),cv2.INTER_AREA)
+                    #self.debug(resizeImage)
                     faceImage.append(resizeImage)
         self.tempImage = faceImage
         return faceImage
@@ -102,7 +109,7 @@ class FaceDetector:
             for image in self.tempImage:
                 temp = cv2.Canny(image,t1,t2)
                 cannyImage.append(cv2.Canny(image,t1,t2))
-                self.debug(temp)
+                #self.debug(temp)
         return cannyImage
     
     def calculatePixelLocation(self, x,y,w,h):
@@ -113,7 +120,7 @@ class FaceDetector:
         return new_start,new_end
 
     def debug(self,imgArray):
-        cv2.imwrite("result-debug/image-{}.jpg".format(self.frameTotal),imgArray)
+        cv2.imwrite("/home/pi/result-debug/image-{}.jpg".format(self.frameTotal),imgArray)
         print("Debug: Writing frame {} to debug folder".format(self.frameTotal))  
         self.frameTotal += 1
 
@@ -128,16 +135,20 @@ class HelmetDetector:
         self.stopFlag = False
         self.counter = 0
         self.tallyCounter = np.zeros(2)
-        self.interpreter = tf.lite.Interpreter(tflitePath)
+        self.interpreter = tflite.Interpreter(tflitePath)
         self.interpreter.allocate_tensors()
         self.input_details = self.interpreter.get_input_details()
         self.output_details = self.interpreter.get_output_details()
+        self.frameTotal = 1
     
-    def debug(self, resizeImage, cannyImage):
+    def debug(self, resizeImage, detectResult):
+        cv2.imwrite("/home/pi/result-debug/image-{}-{}.jpg".format(self.frameTotal,detectResult),resizeImage)
+        print("Debug: Writing frame {} to debug folder".format(detectResult))
+        self.frameTotal += 1
         #cv2.imshow("debug-1", resizeImage)
         #cv2.imshow("debug-2", cannyImage)
         #cv2.waitKey(10)
-        pass
+        #pass
 
     def _thresholdFFT(self,TwoDInput):
         fftx = np.fft.fft2(TwoDInput)
@@ -148,9 +159,9 @@ class HelmetDetector:
         #return 1D FFT value
         return detectOnRectangle
 
-    def _dataTypeConversion(self, OneDInput):
+    def _dataTypeConversion(self, TwoDInput):
         #Transpose input array needed for prediction
-        inputframe = np.reshape(OneDInput,(1,128,128,1))
+        inputframe = np.reshape(TwoDInput,(1,128,128,1))
         #Check if the inputframe type is quantized, then rescale inputframe data to uint8
         #if self.input_details[0]['dtype'] == np.uint8:
         #    input_scale, input_zero_point = self.input_details[0]["quantization"]
@@ -160,9 +171,9 @@ class HelmetDetector:
 
     def _predictionPreProcess(self,inputFrame):
         #FFT with thresholding process
-        FlattenFFT = self._thresholdFFT(inputFrame)
+        #FlattenFFT = self._thresholdFFT(inputFrame)
         #Data Type Conversion to convert 2D array to tf array needed by model
-        return self._dataTypeConversion(FlattenFFT)
+        return self._dataTypeConversion(inputFrame)
 
     def blackCenteredFrame():
         pass
@@ -171,7 +182,7 @@ class HelmetDetector:
         faceImage = self.FaceDetection.getFace()
         cannyImage = self.FaceDetection.getCanny()
         for face in faceImage:
-            self.debug(faceImage[0],face)
+            #self.debug(faceImage[0],face)
             input_data = self._predictionPreProcess(face)
             self.interpreter.set_tensor(self.input_details[0]['index'], input_data)
             # Run model calculation
@@ -181,20 +192,23 @@ class HelmetDetector:
             output_data = self.interpreter.get_tensor(self.output_details[0]['index'])
             # As per tensorflow documentation for model with quantize output 
             output_data = output_data
-            return output_data
-    
+            return (output_data, face)
+        return(None,None)
+
     def detectHelmet(self):
-        output_data = self.runPrediction()
+        output_data,face = self.runPrediction()
         if output_data is not None:
-            if output_data[0][0] > self.confidence:
+            if output_data[0][0] > output_data[0][1] and output_data[0][0] > self.confidence:
                 plus = np.array([1,0])
                 self.tallyCounter = np.add(self.tallyCounter,plus)
                 txtPrintImg = ["Helmet Detected",(0,255,0)]
+                self.debug(face,"helmet")
                 print(txtPrintImg[0]) 
-            elif output_data[0][1] > self.confidence:
+            if output_data[0][1] > output_data[0][0] and output_data[0][1] > self.confidence:
                 plus = np.array([0,1])
                 self.tallyCounter = np.add(self.tallyCounter,plus)
                 txtPrintImg = ["Helmet not Detected",(0,0,255)]
+                self.debug(face,"nohelmet")
                 print(txtPrintImg[0])
             self.counter += 1
 
