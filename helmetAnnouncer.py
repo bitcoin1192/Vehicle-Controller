@@ -18,7 +18,7 @@ def main():
     if vidcap.isOpened() is True:
         td = detector.ImageProcessor(vidcap)
         fd = detector.FaceDetector(td,128,128,1.8)
-        hd = detector.HelmetDetector(fd,0.8,1)
+        hd = detector.HelmetDetector(fd,0.6,3)
         Controller = bus.get("com.sisalma.pydbus")
         try:
             while(True):

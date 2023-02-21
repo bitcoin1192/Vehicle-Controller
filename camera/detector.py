@@ -56,7 +56,7 @@ class ImageProcessor:
         norm = np.zeros((128,128))
         gray = cv2.cvtColor(inputImage, cv2.COLOR_RGB2GRAY)
         norm = cv2.normalize(gray,norm,0,255,cv2.NORM_MINMAX)
-        return gray
+        return norm
         #Normalize gray frame
         #norm = cv2.normalize(gray,norm,0,255,cv2.NORM_MINMAX)
         #image_norm = cv2.normalize(gray, None, alpha=0,beta=200, norm_type=cv2.NORM_MINMAX)
@@ -85,7 +85,7 @@ class FaceDetector:
         grayImage = self.ImgProcess.ImagePreProcessing()
         #self.debug(grayImage)
         faceImage = []
-        facePosition = self.face_cascade.detectMultiScale(grayImage, scaleFactor=1.3, minNeighbors=2)
+        facePosition = self.face_cascade.detectMultiScale(grayImage, scaleFactor=1.4, minNeighbors=3)
         for faceCoordinate in facePosition:
             x,y,width,height = faceCoordinate
             if width < self.minPixelSize:
@@ -202,13 +202,13 @@ class HelmetDetector:
                 plus = np.array([1,0])
                 self.tallyCounter = np.add(self.tallyCounter,plus)
                 txtPrintImg = ["Helmet Detected",(0,255,0)]
-                self.debug(face,"helmet")
+#                self.debug(face,"helmet-{}".format(output_data[0][0]))
                 print(txtPrintImg[0]) 
             if output_data[0][1] > output_data[0][0] and output_data[0][1] > self.confidence:
                 plus = np.array([0,1])
                 self.tallyCounter = np.add(self.tallyCounter,plus)
                 txtPrintImg = ["Helmet not Detected",(0,0,255)]
-                self.debug(face,"nohelmet")
+#                self.debug(face,"nohelmet-{}".format(output_data[0][1]))
                 print(txtPrintImg[0])
             self.counter += 1
 
