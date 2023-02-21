@@ -90,38 +90,38 @@ def testModel(intest, sampleNumber):
                         if(new_start[0]< 0 or new_start[1] < 0 or new_end[0] > 1179 or new_end[1] > 719):
                             pass
                         else:
-                            maskSize = np.ones((720,1280),dtype=np.uint8)
-                            maskSize[blackOutMaskStart[1]:blackOutMaskEnd[1],blackOutMaskStart[0]:blackOutMaskEnd[0]] = 0
+                            #maskSize = np.ones((720,1280),dtype=np.uint8)
+                            #maskSize[blackOutMaskStart[1]:blackOutMaskEnd[1],blackOutMaskStart[0]:blackOutMaskEnd[0]] = 0
                             #maskSize[y:y+h,x:x+w] = 0
-                            resizeMask = cv2.resize(maskSize[new_start[1]:new_end[1],new_start[0]:new_end[0]],(128,128),cv2.INTER_AREA)
+                            #resizeMask = cv2.resize(maskSize[new_start[1]:new_end[1],new_start[0]:new_end[0]],(128,128),cv2.INTER_AREA)
                             #image_norm[y:y+h-50,x:x+w-50] = 0
                             resizeFace = cv2.resize(image_norm[new_start[1]:new_end[1],new_start[0]:new_end[0]],(128,128),cv2.INTER_AREA)
                             #blur = cv2.blur(resizeFace,(1,1))
                             blur = resizeFace
-                            visualCanny = cv2.Canny(image_norm[new_start[1]:new_end[1],new_start[0]:new_end[0]],t1,t2)
-                            visualCanny = image_norm[new_start[1]:new_end[1],new_start[0]:new_end[0]]
+                            #visualCanny = cv2.Canny(image_norm[new_start[1]:new_end[1],new_start[0]:new_end[0]],t1,t2)
+                            #visualCanny = image_norm[new_start[1]:new_end[1],new_start[0]:new_end[0]]
                             #visualCanny = visualCanny*maskSize[new_start[1]:new_end[1],new_start[0]:new_end[0]]
-                            detectOnRectangle = cv2.Canny(blur,t1,t2)
+                            #detectOnRectangle = cv2.Canny(blur,t1,t2)
                             #cv2.imshow("maskres",detectOnRectangle)
-                            detectOnRectangle = detectOnRectangle*resizeMask
+                            #detectOnRectangle = detectOnRectangle*resizeMask
 #                            cv2.imshow("realDetection", blur)
                             #cv2.imshow("maskcheck",resizeMask*255)
 
-                            fftx = np.fft.fft2(detectOnRectangle)
-                            fftshift = np.fft.fftshift(fftx).flatten('F')
-                            detectOnRectangle = np.abs(fftshift[0:ceil(fftx.size/2)].real)
-                            cutoffThr = np.amax(detectOnRectangle)/2
-                            detectOnRectangle[detectOnRectangle<cutoffThr] = 0
+                            #fftx = np.fft.fft2(detectOnRectangle)
+                            #fftshift = np.fft.fftshift(fftx).flatten('F')
+                            #detectOnRectangle = np.abs(fftshift[0:ceil(fftx.size/2)].real)
+                            #cutoffThr = np.amax(detectOnRectangle)/2
+                            #detectOnRectangle[detectOnRectangle<cutoffThr] = 0
 
-                            if(len(img.shape) < 3):
-                                anyhow = np.ndarray((visualCanny.shape[0],visualCanny.shape[1]))
-                                anyhow[0:visualCanny.shape[0],0:visualCanny.shape[1]] = visualCanny
-                            else:
-                                anyhow = np.ndarray((visualCanny.shape[0],visualCanny.shape[1],len(img.shape)))
-                                anyhow[0:visualCanny.shape[0],0:visualCanny.shape[1],0] = visualCanny
-                                anyhow[0:visualCanny.shape[0],0:visualCanny.shape[1],1] = visualCanny
-                                anyhow[0:visualCanny.shape[0],0:visualCanny.shape[1],2] = visualCanny
-                            img[new_start[1]:new_end[1],new_start[0]:new_end[0]] = anyhow
+                            #if(len(img.shape) < 3):
+                            #    anyhow = np.ndarray((visualCanny.shape[0],visualCanny.shape[1]))
+                            #    anyhow[0:visualCanny.shape[0],0:visualCanny.shape[1]] = visualCanny
+                            #else:
+                            #    anyhow = np.ndarray((visualCanny.shape[0],visualCanny.shape[1],len(img.shape)))
+                            #    anyhow[0:visualCanny.shape[0],0:visualCanny.shape[1],0] = visualCanny
+                            #    anyhow[0:visualCanny.shape[0],0:visualCanny.shape[1],1] = visualCanny
+                            #    anyhow[0:visualCanny.shape[0],0:visualCanny.shape[1],2] = visualCanny
+                            #img[new_start[1]:new_end[1],new_start[0]:new_end[0]] = anyhow
                             #train_model.summary()
                             #print(detectOnRectangle.shape)
                             confidence = -100
@@ -193,7 +193,7 @@ def testModel(intest, sampleNumber):
     print("Positive: {}, Negative: {}".format(intest[0],intest[1]))
     print("TP: {}, FP: {}, TN: {}, FN: {}".format(tp,fp,tn,fn))
     vid.release()
-    cv2.destroyAllWindows()
+    #cv2.destroyAllWindows()
     input("\nPress enter to end test {}".format(subject))
 
-testModel(['helm','no-helmet'],20)
+testModel(['helm','no-helmet'],60)
