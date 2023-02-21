@@ -13,14 +13,10 @@ distortionCalibPath = "/home/pi/final-skripsi/camera/dist.correction.npy"
 t1 = 255/3
 t2 = 255/2
 
-#os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-#tf.get_logger().setLevel('ERROR')
 mtxconst = np.load(matrixCalibPath)
 distconst = np.load(distortionCalibPath)
 newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtxconst, distconst, (1280,720), 1, (1280,720))
 vid = cv2.VideoCapture(0)
-#vid.release()
-#vid = cv2.VideoCapture(0)
 #face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 face_cascade = cv2.CascadeClassifier('haar_alt')
 #face_cascade = cv2.CascadeClassifier('haar_alt2')
@@ -51,10 +47,6 @@ def testModel(intest, sampleNumber):
         while(i<sampleNumber):
             norm = np.zeros((128,128))
             detection = False
-            #plt.xlim(right=100000)
-            #plt.xlim(right=100000)
-            # Capture the video frame
-            # by frame
             ret, frame = vid.read()
             dst = cv2.undistort(frame, mtxconst, distconst, None, newcameramtx)
             frame = cv2.flip(frame,0)
@@ -85,8 +77,6 @@ def testModel(intest, sampleNumber):
                         center_y = y+h//2
                         new_start = (int(center_x-(w/2*fS_scale)),int(center_y-(h/2*fS_scale)))
                         new_end = (int(center_x+(w/2*fS_scale)),int(center_y+(h/2*fS_scale)))
-                        blackOutMaskEnd = (int(center_x+((w/2)*fS_scaledown)),int(center_y+((h/2)*fS_scaledown)))
-                        blackOutMaskStart = (int(center_x-((w/2)*fS_scaledown)),int(center_y-((h/2)*fS_scaledown)))
                         if(new_start[0]< 0 or new_start[1] < 0 or new_end[0] > 1179 or new_end[1] > 719):
                             pass
                         else:
@@ -104,7 +94,7 @@ def testModel(intest, sampleNumber):
                             #detectOnRectangle = cv2.Canny(blur,t1,t2)
                             #cv2.imshow("maskres",detectOnRectangle)
                             #detectOnRectangle = detectOnRectangle*resizeMask
-#                            cv2.imshow("realDetection", blur)
+                            cv2.imshow("realDetection", blur)
                             #cv2.imshow("maskcheck",resizeMask*255)
 
                             #fftx = np.fft.fft2(detectOnRectangle)
@@ -156,7 +146,7 @@ def testModel(intest, sampleNumber):
                                 plus = np.array([1,0])
                                 tally = np.add(tally,plus)
                                 txtPrintImg = ["Helmet Detected",(0,255,0)]
-                            if output_data[0][1] > output_data[0][0] and output_data[0][1] > 0.5:
+                            elif output_data[0][1] > output_data[0][0] and output_data[0][1] > 0.5:
                                 plus = np.array([0,1])
                                 tally = np.add(tally,plus)
                                 txtPrintImg = ["Helmet not Detected",(0,0,255)]
