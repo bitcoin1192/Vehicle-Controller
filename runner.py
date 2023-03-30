@@ -22,7 +22,7 @@ def watchDogs(processList):
     while(True):
         for process in processList:
             process.poll()
-            print(process.returncode)
+            print("Watchdog receive: {}".format(process.returncode))
             if process.returncode:
                 print("Something happen to subprocess")
                 raise KeyboardInterrupt
