@@ -8,3 +8,5 @@ camera/__pycache__
 __pycache__
 bluezdbusInterface/__pycache__
 logs.log
+*.mp4
+*.h264

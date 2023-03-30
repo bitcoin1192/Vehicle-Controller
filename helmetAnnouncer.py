@@ -17,12 +17,12 @@ def main():
     vidcap = VideoCapture(0)
     if vidcap.isOpened() is True:
         td = detector.ImageProcessor(vidcap)
-        fd = detector.FaceDetector(td,128,128,1.8)
-        hd = detector.HelmetDetector(fd,0.6,3)
+        fd = detector.FaceDetector(td,128,128,1.7)
+        hd = detector.HelmetDetector(fd,0.75,2)
         Controller = bus.get("com.sisalma.pydbus")
         try:
             while(True):
-                if Controller.bluetoothKeyVerified == True:
+                if Controller.bluetoothKeyVerified == False:
                     hd.stopFlags(False)
                 else:
                     #print("Pausing helmet detection: BluetoothKey is not verified")

@@ -7,8 +7,8 @@ import cv2
 import tflite_runtime.interpreter as tflite
 import os
 
-matrixCalibPath = "/home/pi/final-skripsi/camera/mtx.correction.npy"
-distortionCalibPath = "/home/pi/final-skripsi/camera/dist.correction.npy"
+matrixCalibPath = "/home/pi/final-skripsi/camera/mtx.correction-2.npy"
+distortionCalibPath = "/home/pi/final-skripsi/camera/dist.correction-2.npy"
 
 t1 = 255/3
 t2 = 255/2
@@ -26,7 +26,8 @@ vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 #vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
 #vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
 #train_model = tf.keras.models.load_model('trained_model/my_model')
-interpreter = tflite.Interpreter("model-tanh-5-test.tflite")
+interpreter = tflite.Interpreter("model-test-test.tflite")
+#interpreter = tflite.Interpreter("model-relu-1-test.tflite")
 interpreter.allocate_tensors()
 input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
@@ -48,20 +49,20 @@ def testModel(intest, sampleNumber):
             norm = np.zeros((128,128))
             detection = False
             ret, frame = vid.read()
-            dst = cv2.undistort(frame, mtxconst, distconst, None, newcameramtx)
-            frame = cv2.flip(frame,0)
             if type(frame) == None or ret != True:
                 pass
             else:
+                frame = cv2.undistort(frame, mtxconst, distconst, None, newcameramtx)
+                frame = cv2.flip(frame,0)
                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 norm = cv2.normalize(gray,norm,0,255,cv2.NORM_MINMAX)
                 face = face_cascade.detectMultiScale(norm, scaleFactor=1.3, minNeighbors=3)
-                fS_scale = 1.8
+                fS_scale = 1.7
 
                 fS_scaledown = 0.4
                 #image_norm = cv2.normalize(gray, None, alpha=0,beta=200, norm_type=cv2.NORM_MINMAX)
                 #image_norm = cv2.equalizeHist(gray)
-                image_norm = norm
+                image_norm = frame
                 
                 for (x,y,w,h) in face:
                     if w < 128:
@@ -74,7 +75,7 @@ def testModel(intest, sampleNumber):
                         #img = cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,244),2)
                         img = frame
                         center_x = x+w//2
-                        center_y = y+h//2
+                        center_y = -15+y+h//2
                         new_start = (int(center_x-(w/2*fS_scale)),int(center_y-(h/2*fS_scale)))
                         new_end = (int(center_x+(w/2*fS_scale)),int(center_y+(h/2*fS_scale)))
                         if(new_start[0]< 0 or new_start[1] < 0 or new_end[0] > 1179 or new_end[1] > 719):
@@ -94,7 +95,7 @@ def testModel(intest, sampleNumber):
                             #detectOnRectangle = cv2.Canny(blur,t1,t2)
                             #cv2.imshow("maskres",detectOnRectangle)
                             #detectOnRectangle = detectOnRectangle*resizeMask
-                            cv2.imshow("realDetection", blur)
+                            #cv2.imshow("realDetection", blur)
                             #cv2.imshow("maskcheck",resizeMask*255)
 
                             #fftx = np.fft.fft2(detectOnRectangle)
@@ -115,38 +116,39 @@ def testModel(intest, sampleNumber):
                             #train_model.summary()
                             #print(detectOnRectangle.shape)
                             confidence = -100
-                            inputframe = np.reshape(blur,(1,128,128,1))
+                            inputframe = np.reshape(blur,(1,128,128,3))
                             # Test model on random inputframe data.
                             # Check if the inputframe type is quantized, then rescale inputframe data to uint8
                             #if input_details[0]['dtype'] == np.uint8:
                             #    input_scale, input_zero_point = input_details[0]["quantization"]
                             #    inputframe = inputframe / input_scale + input_zero_point
-                            input_data = np.array(inputframe, dtype=np.float32)
+                            input_data = np.array(inputframe, dtype=np.float32)#/255.0
                             
                             interpreter.set_tensor(input_details[0]['index'], input_data)
                             
                             interpreter.invoke()
                             toc = time.perf_counter()
                             elapsed = toc-tic
+                            print("Time taken: {} \n".format(elapsed))
                             # The function `get_tensor()` returns a copy of the tensor data.
                             # Use `tensor()` in order to get a pointer to the tensor.
                             output_data = interpreter.get_tensor(output_details[0]['index'])
                             output_data = output_data
-                            confidence = -100
+                            '''confidence = -100
                             output = 0
                             for idx, output in np.ndenumerate(output_data):
                                 if confidence < output:
                                     h_idx = idx
-                                    confidence = output
+                                    confidence = output'''
                             
                             #print(output_data)
                             #if (True):
                             print(confidence)
-                            if output_data[0][0] > output_data[0][1] and output_data[0][0] > 0.5:
+                            if output_data[0][0] > output_data[0][1] and output_data[0][0] > 0.65:
                                 plus = np.array([1,0])
                                 tally = np.add(tally,plus)
                                 txtPrintImg = ["Helmet Detected",(0,255,0)]
-                            elif output_data[0][1] > output_data[0][0] and output_data[0][1] > 0.5:
+                            elif output_data[0][1] > output_data[0][0] and output_data[0][1] > 0.65:
                                 plus = np.array([0,1])
                                 tally = np.add(tally,plus)
                                 txtPrintImg = ["Helmet not Detected",(0,0,255)]
@@ -186,4 +188,4 @@ def testModel(intest, sampleNumber):
     #cv2.destroyAllWindows()
     input("\nPress enter to end test {}".format(subject))
 
-testModel(['helm','no-helmet'],60)
+testModel(['helm','no-helmet'],10)

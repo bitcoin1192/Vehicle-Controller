@@ -8,13 +8,13 @@ import tflite_runtime.interpreter as tflite
 t1 = 255/3
 t2 = 255/2
 #cvHaarPath = "/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/haar_alt"
-#tflitePath = "/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/model-relu-3.tflite"
+#tflitePath = "/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/model-relu-3-test (5).tflite"
 #matrixCalibPath = "/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/mtx.correction.npy"
 #distortionCalibPath = "/home/lumin0x1/Documents/kode-skripsi/raspberrypi-app/camera/dist.correction.npy"
 cvHaarPath = "/home/pi/final-skripsi/camera/haar_alt"
-tflitePath = "/home/pi/final-skripsi/camera/model-tanh-5-test.tflite"
-matrixCalibPath = "/home/pi/final-skripsi/camera/mtx.correction.npy"
-distortionCalibPath = "/home/pi/final-skripsi/camera/dist.correction.npy"
+tflitePath = "/home/pi/final-skripsi/camera/model-resnet50-relu-1.tflite"
+matrixCalibPath = "/home/pi/final-skripsi/camera/mtx.correction-2.npy"
+distortionCalibPath = "/home/pi/final-skripsi/camera/dist.correction-2.npy"
 
 debug = False
 
@@ -24,7 +24,7 @@ class ImageProcessor:
         self.vid = CVCaptureDevice
         self.vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
         self.vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-        self.vid.set(cv2.CAP_PROP_AUTO_EXPOSURE, 1)
+        self.vid.set(cv2.CAP_PROP_AUTO_EXPOSURE, 0.75)
         self.mtxconst = np.load(matrixCalibPath)
         self.distconst = np.load(distortionCalibPath)
         self.newcameramtx, self.roi = cv2.getOptimalNewCameraMatrix(self.mtxconst, self.distconst, (1280,720), 1, (1280,720))
@@ -40,7 +40,7 @@ class ImageProcessor:
             if ret == True:
                 x,y,w,h = self.roi
                 dst = cv2.undistort(frame, self.mtxconst, self.distconst, None, self.newcameramtx)
-                dst = dst[y:y+h,x:x+w]
+                #dst = dst[y:y+h,x:x+w]
                 frame = cv2.flip(dst,0)
 #                print("Reading camera")
                 #frame = dst
@@ -56,7 +56,7 @@ class ImageProcessor:
         norm = np.zeros((128,128))
         gray = cv2.cvtColor(inputImage, cv2.COLOR_RGB2GRAY)
         norm = cv2.normalize(gray,norm,0,255,cv2.NORM_MINMAX)
-        return norm
+        return (gray,inputImage)
         #Normalize gray frame
         #norm = cv2.normalize(gray,norm,0,255,cv2.NORM_MINMAX)
         #image_norm = cv2.normalize(gray, None, alpha=0,beta=200, norm_type=cv2.NORM_MINMAX)
@@ -82,10 +82,12 @@ class FaceDetector:
         self.frameTotal = 1
     
     def getFace(self):
-        grayImage = self.ImgProcess.ImagePreProcessing()
-        #self.debug(grayImage)
+        imageTupple = self.ImgProcess.ImagePreProcessing()
+        grayImage = imageTupple[0]
+        colorImage = imageTupple[1]
+        self.debug(grayImage)
         faceImage = []
-        facePosition = self.face_cascade.detectMultiScale(grayImage, scaleFactor=1.4, minNeighbors=3)
+        facePosition = self.face_cascade.detectMultiScale(grayImage, scaleFactor=1.3, minNeighbors=3)
         for faceCoordinate in facePosition:
             x,y,width,height = faceCoordinate
             if width < self.minPixelSize:
@@ -93,11 +95,11 @@ class FaceDetector:
                 print("Rejected: Width is less than 128")
             else:
                 start, end = self.calculatePixelLocation(x,y,width,height)
-                if start[0] < 0 or start[1] < 0 or end[0] < 0 or end[1] < 0:
+                if start[0] < 0 or start[1] < 0 or end[0] > 1280 or end[1] > 720:
                     pass
                 else:
                     print("Detecting face")
-                    resizeImage = cv2.resize(grayImage[start[1]:end[1],start[0]:end[0]],(128,128),cv2.INTER_AREA)
+                    resizeImage = cv2.resize(colorImage[start[1]:end[1],start[0]:end[0]],(128,128),cv2.INTER_AREA)
                     #self.debug(resizeImage)
                     faceImage.append(resizeImage)
         self.tempImage = faceImage
@@ -114,13 +116,13 @@ class FaceDetector:
     
     def calculatePixelLocation(self, x,y,w,h):
         center_x = x+w//2
-        center_y = y+h//2
+        center_y = -15+y+h//2
         new_start = (int(center_x-(w/2*self.fS_scale)),int(center_y-(h/2*self.fS_scale)))
         new_end = (int(center_x+(w/2*self.fS_scale)),int(center_y+(h/2*self.fS_scale)))
         return new_start,new_end
 
-    def debug(self,imgArray):
-        cv2.imwrite("/home/pi/result-debug/image-{}.jpg".format(self.frameTotal),imgArray)
+    def debug(self,img):
+        cv2.imwrite("/home/pi/result-debug/image-{}.jpg".format(self.frameTotal),img)
         print("Debug: Writing frame {} to debug folder".format(self.frameTotal))  
         self.frameTotal += 1
 
@@ -160,13 +162,14 @@ class HelmetDetector:
         return detectOnRectangle
 
     def _dataTypeConversion(self, TwoDInput):
-        #Transpose input array needed for prediction
-        inputframe = np.reshape(TwoDInput,(1,128,128,1))
+        #Reshape for model input, resnet50 require rgb image. In total 3 channel is needed
+        inputframe = np.reshape(TwoDInput,(1,128,128,3))
         #Check if the inputframe type is quantized, then rescale inputframe data to uint8
         #if self.input_details[0]['dtype'] == np.uint8:
         #    input_scale, input_zero_point = self.input_details[0]["quantization"]
         #    inputframe = inputframe / input_scale + input_zero_point
         #Return unsigned int8 one dimensional array
+        #Resnet50 is already equipped with image scaler, no need for scaling here.
         return np.array(inputframe, dtype=np.float32)
 
     def _predictionPreProcess(self,inputFrame):
@@ -202,13 +205,13 @@ class HelmetDetector:
                 plus = np.array([1,0])
                 self.tallyCounter = np.add(self.tallyCounter,plus)
                 txtPrintImg = ["Helmet Detected",(0,255,0)]
-#                self.debug(face,"helmet-{}".format(output_data[0][0]))
+                self.debug(face,"helmet-{}".format(output_data[0][0]))
                 print(txtPrintImg[0]) 
             if output_data[0][1] > output_data[0][0] and output_data[0][1] > self.confidence:
                 plus = np.array([0,1])
                 self.tallyCounter = np.add(self.tallyCounter,plus)
                 txtPrintImg = ["Helmet not Detected",(0,0,255)]
-#                self.debug(face,"nohelmet-{}".format(output_data[0][1]))
+                self.debug(face,"nohelmet-{}".format(output_data[0][1]))
                 print(txtPrintImg[0])
             self.counter += 1
 
