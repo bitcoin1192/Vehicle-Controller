@@ -230,10 +230,10 @@ class HelmetDetector:
 
     def _makeDecision(self):
         if self.tallyCounter[0] < self.tallyCounter[1]:
-            self.currentHelmetStatus = False
-        else:
             self.currentHelmetStatus = True
-        print(self.tallyCounter)
+        else:
+            self.currentHelmetStatus = False
+        #print(self.tallyCounter)
 
     def resetCounter(self):
         self.counter = 0
