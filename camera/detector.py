@@ -18,6 +18,8 @@ distortionCalibPath = "/home/pi/final-skripsi/camera/dist.correction-2.npy"
 
 debug = False
 
+frameTotal = 1
+
 class ImageProcessor:
     def __init__(self, CVCaptureDevice) -> None:
         #Set camera source and it's resolution
@@ -79,7 +81,7 @@ class FaceDetector:
         self.face_cascade = cv2.CascadeClassifier(cvHaarPath)
         self.tempImage = 0
         self.debugFlag = debug
-        self.frameTotal = 1
+        #self.frameTotal = 1
     
     def getFace(self):
         imageTupple = self.ImgProcess.ImagePreProcessing()
@@ -122,9 +124,10 @@ class FaceDetector:
         return new_start,new_end
 
     def debug(self,img):
-        cv2.imwrite("/home/pi/result-debug/image-{}.jpg".format(self.frameTotal),img)
-        print("Debug: Writing frame {} to debug folder".format(self.frameTotal))  
-        self.frameTotal += 1
+        global frameTotal
+        cv2.imwrite("/home/pi/result-debug/image-{}.jpg".format(frameTotal),img)
+        print("Debug: Writing frame {} to debug folder".format(frameTotal))  
+        frameTotal += 1
 
 
 class HelmetDetector:
@@ -141,12 +144,12 @@ class HelmetDetector:
         self.interpreter.allocate_tensors()
         self.input_details = self.interpreter.get_input_details()
         self.output_details = self.interpreter.get_output_details()
-        self.frameTotal = 1
+        #self.frameTotal = 1
     
     def debug(self, resizeImage, detectResult):
-        cv2.imwrite("/home/pi/result-debug/image-{}-{}.jpg".format(self.frameTotal,detectResult),resizeImage)
+        global frameTotal
+        cv2.imwrite("/home/pi/result-debug/image-{}-{}.jpg".format(frameTotal,detectResult),resizeImage)
         print("Debug: Writing frame {} to debug folder".format(detectResult))
-        self.frameTotal += 1
         #cv2.imshow("debug-1", resizeImage)
         #cv2.imshow("debug-2", cannyImage)
         #cv2.waitKey(10)
