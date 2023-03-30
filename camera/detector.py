@@ -233,7 +233,7 @@ class HelmetDetector:
             self.currentHelmetStatus = True
         else:
             self.currentHelmetStatus = False
-        #print(self.tallyCounter)
+        print(self.tallyCounter)
 
     def resetCounter(self):
         self.counter = 0

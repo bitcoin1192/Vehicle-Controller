@@ -33,7 +33,7 @@ def main():
                 if result == None:
                     print("Detection not started")
                 else:
-                    print(result)
+                    print("Result is: {}".format(result))
                     Controller.HelmetStatus(result)
         except GLib.Error as err:
             print("Complementary program exitting")
