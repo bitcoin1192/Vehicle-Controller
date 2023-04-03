@@ -167,8 +167,6 @@ class HelmetDetector:
         return np.array(inputframe, dtype=np.float32)
 
     def _predictionPreProcess(self,inputFrame):
-        #FFT with thresholding process
-        #FlattenFFT = self._thresholdFFT(inputFrame)
         #Data Type Conversion to convert 2D array to tf array needed by model
         return self._dataTypeConversion(inputFrame)
 
