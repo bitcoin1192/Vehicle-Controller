@@ -107,15 +107,6 @@ class FaceDetector:
         self.tempImage = faceImage
         return faceImage
     
-    def getCanny(self):
-        cannyImage = []
-        if len(self.tempImage) != 0:
-            for image in self.tempImage:
-                temp = cv2.Canny(image,t1,t2)
-                cannyImage.append(cv2.Canny(image,t1,t2))
-                #self.debug(temp)
-        return cannyImage
-    
     def calculatePixelLocation(self, x,y,w,h):
         center_x = x+w//2
         center_y = -15+y+h//2
@@ -172,7 +163,6 @@ class HelmetDetector:
 
     def runPrediction(self):
         faceImage = self.FaceDetection.getFace()
-        cannyImage = self.FaceDetection.getCanny()
         for face in faceImage:
             #self.debug(faceImage[0],face)
             input_data = self._predictionPreProcess(face)
