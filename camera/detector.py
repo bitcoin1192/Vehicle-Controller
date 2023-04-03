@@ -150,10 +150,6 @@ class HelmetDetector:
         global frameTotal
         cv2.imwrite("/home/pi/result-debug/image-{}-{}.jpg".format(frameTotal,detectResult),resizeImage)
         print("Debug: Writing frame {} to debug folder".format(detectResult))
-        #cv2.imshow("debug-1", resizeImage)
-        #cv2.imshow("debug-2", cannyImage)
-        #cv2.waitKey(10)
-        #pass
 
     def _thresholdFFT(self,TwoDInput):
         fftx = np.fft.fft2(TwoDInput)
