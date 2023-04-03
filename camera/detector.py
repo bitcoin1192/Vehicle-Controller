@@ -142,14 +142,6 @@ class HelmetDetector:
         cv2.imwrite("/home/pi/result-debug/image-{}-{}.jpg".format(frameTotal,detectResult),resizeImage)
         print("Debug: Writing frame {} to debug folder".format(detectResult))
 
-    def _thresholdFFT(self,TwoDInput):
-        fftx = np.fft.fft2(TwoDInput)
-        fftshift = np.fft.fftshift(fftx).flatten('F')
-        detectOnRectangle = np.abs(fftshift[0:ceil(fftx.size/2)].real)
-        cutoffThr = np.amax(detectOnRectangle)/2
-        detectOnRectangle[detectOnRectangle<cutoffThr] = 0
-        #return 1D FFT value
-        return detectOnRectangle
 
     def _dataTypeConversion(self, TwoDInput):
         #Reshape for model input, resnet50 require rgb image. In total 3 channel is needed
