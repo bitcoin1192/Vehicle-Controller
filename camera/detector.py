@@ -163,11 +163,6 @@ class HelmetDetector:
     def _dataTypeConversion(self, TwoDInput):
         #Reshape for model input, resnet50 require rgb image. In total 3 channel is needed
         inputframe = np.reshape(TwoDInput,(1,128,128,3))
-        #Check if the inputframe type is quantized, then rescale inputframe data to uint8
-        #if self.input_details[0]['dtype'] == np.uint8:
-        #    input_scale, input_zero_point = self.input_details[0]["quantization"]
-        #    inputframe = inputframe / input_scale + input_zero_point
-        #Return unsigned int8 one dimensional array
         #Resnet50 is already equipped with image scaler, no need for scaling here.
         return np.array(inputframe, dtype=np.float32)
 
