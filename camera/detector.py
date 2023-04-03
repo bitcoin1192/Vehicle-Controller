@@ -189,7 +189,10 @@ class HelmetDetector:
                 print(txtPrintImg[0])
             self.counter += 1
 
-        
+    """This function is called from helmetAnnouncer.py to get the current helmet status.
+       It will return True if helmet is detected, False if helmet is not detected. 
+       If sampleNeeded is less that specified, it will return last known status.
+       It has intial state of False"""        
     def tallyResult(self):
         if self.stopFlag == False:
             if self.counter >= self.sampleNeeded:
