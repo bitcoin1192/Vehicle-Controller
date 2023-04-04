@@ -22,11 +22,10 @@ def watchDogs(processList):
     while(True):
         for process in processList:
             process.poll()
-            print("Watchdog receive: {}".format(process.returncode))
+            print("Info: Watchdog receive {} from Process {}".format(process.returncode, process.pid))
             if process.returncode:
-                print("Something happen to subprocess")
+                print("Error: Something happen to subprocess")
                 raise KeyboardInterrupt
-#            print("Checking process {}".format(process.pid))
             sleep(2)
 
 main()
