@@ -134,15 +134,7 @@ def testModel(intest, sampleNumber):
                             # Use `tensor()` in order to get a pointer to the tensor.
                             output_data = interpreter.get_tensor(output_details[0]['index'])
                             output_data = output_data
-                            '''confidence = -100
-                            output = 0
-                            for idx, output in np.ndenumerate(output_data):
-                                if confidence < output:
-                                    h_idx = idx
-                                    confidence = output'''
-                            
-                            #print(output_data)
-                            #if (True):
+        
                             print(confidence)
                             if output_data[0][0] > output_data[0][1] and output_data[0][0] > 0.65:
                                 plus = np.array([1,0])
@@ -152,30 +144,13 @@ def testModel(intest, sampleNumber):
                                 plus = np.array([0,1])
                                 tally = np.add(tally,plus)
                                 txtPrintImg = ["Helmet not Detected",(0,0,255)]
-                                '''if h_idx[1] == 0:
-                                    plus = np.array([1,0])
-                                    tally = np.add(tally,plus)
-                                    txtPrintImg = ["Helmet Detected",(0,255,0)]
-                                elif h_idx[1] == 1:
-                                    plus = np.array([0,1])
-                                    tally = np.add(tally,plus)
-                                    txtPrintImg = ["Helmet not Detected",(0,0,255)]'''
                             i += 1
 
                 # Display the resulting frame
                 if(detection):
                     cv2.putText(img,txtPrintImg[0],(40,120),cv2.FONT_HERSHEY_SIMPLEX, 2, txtPrintImg[1],thickness=10)
-                    #cv2.imshow('frame', img)
-                    #cv2.imshow('plot', pltImg)
-#                else:
-                    #cv2.imshow('frame', frame)
-                    
-                # the 'q' button is set as the
-                # quitting button you may use any
-                # desired button of your choice
-#                if cv2.waitKey(1) & 0xFF == ord('q'):
-#                    break    
-#        cv2.destroyAllWindows()
+                    cv2.imwrite("test/{}.jpg".format(i),img)
+        
         resultTally[subject] = tally
     vid.release()
     tp = resultTally['helm'][0]
