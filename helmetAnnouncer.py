@@ -2,15 +2,16 @@ from pydbus import SessionBus, SystemBus
 from camera import detector
 from cv2 import VideoCapture
 from gi.repository import GLib
+from uuidConstant import LOCKED, UNLOCKED, TEST
 import time
 try:
     import board
     import neopixel
     bus = SystemBus()
-    print("Using system bus")
+    print("Warning: Using system bus")
 except ModuleNotFoundError:
     bus = SessionBus()
-    print("Using session bus")
+    print("Warning: Using session bus")
 
 
 def main():
@@ -22,21 +23,23 @@ def main():
         Controller = bus.get("com.sisalma.pydbus")
         try:
             while(True):
-                if Controller.bluetoothKeyVerified == False:
+                if Controller.bluetoothKeyVerified == LOCKED:
+                    print("Warning: Bluetooth command is not received or set to false, pausing detection!")
                     hd.stopFlags(True)
                     hd.resetCounter()
-                    time.sleep(0.5)
-                else:
-                    #print("Pausing helmet detection: BluetoothKey is not verified")
+                    time.sleep(0.35)
+                elif Controller.bluetoothKeyVerified == TEST:
+                    hd.stopFlags(False)
+                elif Controller.bluetoothKeyVerified == UNLOCKED:
                     hd.stopFlags(False)
                 result = hd.tallyResult()
                 if result == None:
-                    print("Detection not started")
+                    print("Warning: Detection not started")
                 else:
                     print("Result is: {}".format(result))
                     Controller.HelmetStatus(result)
         except GLib.Error as err:
-            print("Complementary program exitting")
+            print("Error: Complementary program exitting")
     else:
-        print("Camera not found or timeout")
+        print("Error: Camera not found or timeout")
 main()
