@@ -26,7 +26,7 @@ vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 #vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
 #vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
 #train_model = tf.keras.models.load_model('trained_model/my_model')
-interpreter = tflite.Interpreter("model-test-test.tflite")
+interpreter = tflite.Interpreter("model-resnet50-relu-1.tflite")
 #interpreter = tflite.Interpreter("model-relu-1-test.tflite")
 interpreter.allocate_tensors()
 input_details = interpreter.get_input_details()
@@ -149,7 +149,7 @@ def testModel(intest, sampleNumber):
                 # Display the resulting frame
                 if(detection):
                     cv2.putText(img,txtPrintImg[0],(40,120),cv2.FONT_HERSHEY_SIMPLEX, 2, txtPrintImg[1],thickness=10)
-                    cv2.imwrite("test/{}.jpg".format(i),img)
+                    cv2.imwrite("/home/pi/test/{}.jpg".format(i),img)
         
         resultTally[subject] = tally
     vid.release()
