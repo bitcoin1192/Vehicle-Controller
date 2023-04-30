@@ -1,4 +1,5 @@
 from math import ceil, floor
+
 import time
 from cv2 import COLOR_RGB2BGR
 import numpy as np
@@ -26,7 +27,7 @@ vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 #vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
 #vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
 #train_model = tf.keras.models.load_model('trained_model/my_model')
-interpreter = tflite.Interpreter("model-test-test.tflite")
+interpreter = tflite.Interpreter("model-resnet50-relu-1.tflite")
 #interpreter = tflite.Interpreter("model-relu-1-test.tflite")
 interpreter.allocate_tensors()
 input_details = interpreter.get_input_details()
@@ -45,6 +46,11 @@ def testModel(intest, sampleNumber):
         h_idx = 0
         tally = np.zeros(2)
         input("\nPress enter to test Subject with {}".format(subject))
+        #Clear old image buffer by reading it.
+        while(i <= 4):
+            vid.read()
+            i += 1
+        i = 0
         while(i<sampleNumber):
             norm = np.zeros((128,128))
             detection = False
@@ -56,8 +62,10 @@ def testModel(intest, sampleNumber):
                 frame = cv2.flip(frame,0)
                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 norm = cv2.normalize(gray,norm,0,255,cv2.NORM_MINMAX)
-                face = face_cascade.detectMultiScale(norm, scaleFactor=1.3, minNeighbors=3)
+                face = face_cascade.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=4)
                 fS_scale = 1.7
+#                print("Getting sample: {}".format(i))
+#                cv2.imwrite("/home/pi/test/{}.jpg".format(i),gray)
 
                 fS_scaledown = 0.4
                 #image_norm = cv2.normalize(gray, None, alpha=0,beta=200, norm_type=cv2.NORM_MINMAX)
@@ -78,7 +86,7 @@ def testModel(intest, sampleNumber):
                         center_y = -15+y+h//2
                         new_start = (int(center_x-(w/2*fS_scale)),int(center_y-(h/2*fS_scale)))
                         new_end = (int(center_x+(w/2*fS_scale)),int(center_y+(h/2*fS_scale)))
-                        if(new_start[0]< 0 or new_start[1] < 0 or new_end[0] > 1179 or new_end[1] > 719):
+                        if(new_start[0]< 0 or new_start[1] < 0 or new_end[0] > frame.shape[1] or new_end[1] > frame.shape[0]):
                             pass
                         else:
                             #maskSize = np.ones((720,1280),dtype=np.uint8)
@@ -134,48 +142,31 @@ def testModel(intest, sampleNumber):
                             # Use `tensor()` in order to get a pointer to the tensor.
                             output_data = interpreter.get_tensor(output_details[0]['index'])
                             output_data = output_data
-                            '''confidence = -100
-                            output = 0
-                            for idx, output in np.ndenumerate(output_data):
-                                if confidence < output:
-                                    h_idx = idx
-                                    confidence = output'''
-                            
-                            #print(output_data)
-                            #if (True):
+        
                             print(confidence)
                             if output_data[0][0] > output_data[0][1] and output_data[0][0] > 0.65:
                                 plus = np.array([1,0])
                                 tally = np.add(tally,plus)
                                 txtPrintImg = ["Helmet Detected",(0,255,0)]
+                                i += 1
                             elif output_data[0][1] > output_data[0][0] and output_data[0][1] > 0.65:
                                 plus = np.array([0,1])
                                 tally = np.add(tally,plus)
                                 txtPrintImg = ["Helmet not Detected",(0,0,255)]
-                                '''if h_idx[1] == 0:
-                                    plus = np.array([1,0])
-                                    tally = np.add(tally,plus)
-                                    txtPrintImg = ["Helmet Detected",(0,255,0)]
-                                elif h_idx[1] == 1:
-                                    plus = np.array([0,1])
-                                    tally = np.add(tally,plus)
-                                    txtPrintImg = ["Helmet not Detected",(0,0,255)]'''
-                            i += 1
+                                i += 1
+                            cv2.putText(img,txtPrintImg[0],(40,120),cv2.FONT_HERSHEY_SIMPLEX, 2, txtPrintImg[1],thickness=10)
+                            print("Writing img {}-{}".format(i,subject))
+                            cv2.imwrite("/home/pi/test/{}-{}.jpg".format(i,subject),img)
+                            print("Output is {}".format(output_data[0]))
 
                 # Display the resulting frame
+                '''
                 if(detection):
                     cv2.putText(img,txtPrintImg[0],(40,120),cv2.FONT_HERSHEY_SIMPLEX, 2, txtPrintImg[1],thickness=10)
-                    #cv2.imshow('frame', img)
-                    #cv2.imshow('plot', pltImg)
-#                else:
-                    #cv2.imshow('frame', frame)
-                    
-                # the 'q' button is set as the
-                # quitting button you may use any
-                # desired button of your choice
-#                if cv2.waitKey(1) & 0xFF == ord('q'):
-#                    break    
-#        cv2.destroyAllWindows()
+                    print("Writing img {}-detected".format(i))
+                    cv2.imwrite("/home/pi/test/{}-{}.jpg".format(i,subject),img)
+                    cv2.imwrite("/home/pi/test/{}.jpg".format(i),img)
+                '''
         resultTally[subject] = tally
     vid.release()
     tp = resultTally['helm'][0]
