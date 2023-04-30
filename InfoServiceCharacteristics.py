@@ -22,12 +22,14 @@ class lockStatus(gattCharacteristics):
             print(self.buf)
         if self.buf == "unlock" or self.buf == "u":
             print("Unlocking")
-            self.relayControl.BluetoothKeyStatus(True)
+            self.relayControl.BluetoothKeyStatus(UNLOCKED)
             self.current_status = UNLOCKED
         elif self.buf == "lock" or self.buf == "a":
             print("Locking")
-            self.relayControl.BluetoothKeyStatus(False)
+            self.relayControl.BluetoothKeyStatus(LOCKED)
             self.current_status = LOCKED
+        elif self.buf[0:3] == "test":
+            self.relayControl.BluetoothKeyStatus(TEST)
         self.buf = ""
 
     @dbus.service.method(GATT_CHRC_IFACE,
