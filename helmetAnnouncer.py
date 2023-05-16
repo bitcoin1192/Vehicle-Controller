@@ -19,17 +19,18 @@ def main():
     if vidcap.isOpened() is True:
         td = detector.ImageProcessor(vidcap)
         fd = detector.FaceDetector(td,128,128,1.7)
-        hd = detector.HelmetDetector(fd,0.75,2)
+        hd = detector.HelmetDetector(fd,0.65,2)
         Controller = bus.get("com.sisalma.pydbus")
         try:
             while(True):
                 if Controller.bluetoothKeyVerified == LOCKED:
-                    print("Warning: Bluetooth command is not received or set to false, pausing detection!")
+                    print("Pausing detection!")
                     hd.stopFlags(True)
                     hd.resetCounter()
                     time.sleep(0.35)
                 elif Controller.bluetoothKeyVerified == TEST:
                     hd.stopFlags(False)
+                    print("Bluetooth: TEST")
                 elif Controller.bluetoothKeyVerified == UNLOCKED:
                     hd.stopFlags(False)
                 result = hd.tallyResult()

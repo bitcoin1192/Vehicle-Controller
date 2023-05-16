@@ -4,6 +4,7 @@ from gi.repository import GLib
 import RPi.GPIO as Pin
 import time
 import math
+from uuidConstant import LOCKED, UNLOCKED, TEST, FACEFOUND, FACENOTFOUND, HELMETFOUND
 try:
     import board
     import neopixel
@@ -26,6 +27,7 @@ RELAYON = 0
 RELAYOFF = 1
 
 LEDGREEN = (0,255,12)
+LEDYELLOW = (255,255,0)
 LEDBLUE = (12,0,255)
 LEDRED = (255,12,0)
 LEDOFF = (0,0,0)
@@ -35,14 +37,14 @@ class RelayLogic:
     <node>
       <interface name='com.sisalma.pydbus'>
         <method name='BluetoothKeyStatus'>
-          <arg type='b' name='a' direction='in'/>
+          <arg type='n' name='a' direction='in'/>
           <arg type='b' name='response' direction='out'/>
         </method>
         <method name='HelmetStatus'>
-          <arg type='b' name='a' direction='in'/>
+          <arg type='n' name='a' direction='in'/>
           <arg type='b' name='response' direction='out'/>
         </method>
-        <property name="bluetoothKeyVerified" type="b" access="read">
+        <property name="bluetoothKeyVerified" type="n" access="read">
           <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
         </property>
       </interface>
@@ -54,7 +56,7 @@ class RelayLogic:
             self.pixels = neopixel.NeoPixel(board.D18, 1)
         self.RelayState = RELAYOFF
         self._helmetDetected = False
-        self._bluetoothKeyVerified = False
+        self._bluetoothKeyVerified = LOCKED
         Pin.setmode(Pin.BCM)
         Pin.setup(RelayPin, Pin.OUT)
         self.lockUnlockIO()
@@ -62,24 +64,27 @@ class RelayLogic:
 
     def BluetoothKeyStatus(self, s):
         #Only trigger on State Changes
-        if s != self._bluetoothKeyVerified:
-            self._bluetoothKeyVerified = s
-            self.lockUnlockIO()
+        #if s != self._bluetoothKeyVerified:
+        self._bluetoothKeyVerified = s
+        self.lockUnlockIO()
         
     def HelmetStatus(self, s):
         #Only trigger on State Changes
-        if s != self._helmetDetected:
-            self._helmetDetected = s
-            self.lockUnlockIO()
+        #if s != self._helmetDetected:
+        self._helmetDetected = s
+        self.lockUnlockIO()
     
     def lockUnlockIO(self):
-        if self._bluetoothKeyVerified and self._helmetDetected:
+        if self._bluetoothKeyVerified == UNLOCKED and self._helmetDetected == HELMETFOUND:
             self.RelayState = RELAYON
             self.changeLEDColor(LEDGREEN)
-        elif self._bluetoothKeyVerified and not self._helmetDetected:
+        elif self._bluetoothKeyVerified == UNLOCKED and self._helmetDetected == FACEFOUND:
+            self.changeLEDColor(LEDYELLOW)
+            self.RelayState = RELAYOFF
+        elif self._bluetoothKeyVerified == UNLOCKED and self._helmetDetected == FACENOTFOUND:
             self.changeLEDColor(LEDBLUE)
             self.RelayState = RELAYOFF
-        elif not self._bluetoothKeyVerified :
+        elif self._bluetoothKeyVerified == LOCKED :
             self.RelayState = RELAYOFF
             self.changeLEDColor(LEDRED)
             #Send signal to stop detecting helmet on other script listening
@@ -89,10 +94,10 @@ class RelayLogic:
     def stateAction(self):
         if self.RelayState == RELAYON:
             Pin.output(RelayPin,Pin.HIGH)
-            print("Relay state changes to: ON")
+            #print("Relay state changes to: ON")
         elif self.RelayState == RELAYOFF:
             Pin.output(RelayPin,Pin.LOW)
-            print("Relay state changes to: OFF")
+            #print("Relay state changes to: OFF")
         
         
     @property

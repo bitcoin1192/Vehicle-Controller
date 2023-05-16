@@ -17,7 +17,7 @@ matrixCalibPath = "/home/pi/final-skripsi/camera/mtx.correction-2.npy"
 distortionCalibPath = "/home/pi/final-skripsi/camera/dist.correction-2.npy"
 
 #Global Variable
-debugFlagDetector = False
+debugFlagDetector = True
 frameTotal = 1
 
 class ImageProcessor:
@@ -140,7 +140,7 @@ class HelmetDetector:
     def debug(self, resizeImage, detectResult):
         global frameTotal
         cv2.imwrite("/home/pi/result-debug/image-{}-{}.jpg".format(frameTotal,detectResult),resizeImage)
-        print("Debug: Writing frame {} to debug folder".format(detectResult))
+        print("Debug: Writing helmet detection frame {} to debug folder".format(detectResult))
 
 
     def _dataTypeConversion(self, TwoDInput):
@@ -204,9 +204,9 @@ class HelmetDetector:
 
     def _makeDecision(self):
         if self.tallyCounter[0] < self.tallyCounter[1]:
-            self.currentHelmetStatus = True
-        else:
             self.currentHelmetStatus = False
+        else:
+            self.currentHelmetStatus = True
         print(self.tallyCounter)
 
     def resetCounter(self):

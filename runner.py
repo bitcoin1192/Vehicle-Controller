@@ -13,7 +13,7 @@ def main():
         watchDogs(processList)
     except KeyboardInterrupt or Exception:
         for process in processList:
-            print("Terminating process {}".format(process.pid))
+            print("Process {} terminated".format(process.pid))
             process.terminate()
         print("All running process is terminated !")
             
@@ -22,9 +22,9 @@ def watchDogs(processList):
     while(True):
         for process in processList:
             process.poll()
-            print("Info: Watchdog receive {} from Process {}".format(process.returncode, process.pid))
+            #print("Info: Watchdog receive {} from Process {}".format(process.returncode, process.pid))
             if process.returncode:
-                print("Error: Something happen to subprocess")
+                print("Error: Something happen to subprocess {}".format(process.pid))
                 raise KeyboardInterrupt
             sleep(2)
 
