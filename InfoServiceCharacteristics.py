@@ -17,8 +17,8 @@ class lockStatus(gattCharacteristics):
         self.current_status = lockUpdate
     
     @dbus.service.method(GATT_CHRC_IFACE,
-                        in_signature='aya{sv}',
-                        out_signature='ay')
+                        in_signature='aya{sv}')
+                        #,out_signature='ay')
     def WriteValue(self, value, options):
         for byte in value:
             self.buf = self.buf + chr(byte)
