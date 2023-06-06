@@ -53,7 +53,7 @@ class RelayLogic:
     def __init__(self):
         self.useLED = runOnPI
         if self.useLED:
-            self.pixels = neopixel.NeoPixel(board.D18, 1)
+            self.pixels = neopixel.NeoPixel(board.D12, 1)
         self.RelayState = RELAYOFF
         self._helmetDetected = False
         self._bluetoothKeyVerified = LOCKED
