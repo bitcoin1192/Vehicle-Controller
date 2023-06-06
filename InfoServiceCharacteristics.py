@@ -11,6 +11,7 @@ class lockStatus(gattCharacteristics):
         self.buf = ""
         self.otherbus = SystemBus()
         self.relayControl = self.otherbus.get("com.sisalma.pydbus")
+        self.notifyReq = False
         super().__init__(bus, index, uuid, flags, service)
 
     def statusUpdate(self,lockUpdate):
@@ -34,7 +35,8 @@ class lockStatus(gattCharacteristics):
         elif self.buf[0:3] == "test":
             self.relayControl.BluetoothKeyStatus(TEST)
         self.buf = ""
-        self.PropertiesChanged(GATT_CHRC_IFACE,{'Value': "Something else"},"")
+        if self.notifyReq:
+            self.PropertiesChanged(GATT_CHRC_IFACE,{'Value': ord("s")},[])
 
     @dbus.service.method(GATT_CHRC_IFACE,
                         in_signature='a{sv}',
@@ -50,6 +52,12 @@ class lockStatus(gattCharacteristics):
         for char in temp:
             msg.append(ord(char))
         return msg
+    
+    def StartNotify(self):
+        self.notifyReq = True
+        
+    def StopNotify(self):
+        self.notifyReq = False
 
 class deviceOwner(gattCharacteristics):
     uniqueOwner = 20
