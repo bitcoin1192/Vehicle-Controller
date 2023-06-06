@@ -59,7 +59,7 @@ class Characteristic(dbus.service.Object):
         print('Default ReadValue called, returning error')
         raise NotSupportedException()
 
-    @dbus.service.method(GATT_CHRC_IFACE, in_signature='aya{sv}')
+    @dbus.service.method(GATT_CHRC_IFACE, in_signature='aya{sv}',out_signature='ay')
     def WriteValue(self, value, options):
         print('Default WriteValue called, returning error')
         raise NotSupportedException()

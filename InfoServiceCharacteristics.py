@@ -31,6 +31,7 @@ class lockStatus(gattCharacteristics):
         elif self.buf[0:3] == "test":
             self.relayControl.BluetoothKeyStatus(TEST)
         self.buf = ""
+        return ord("OK")
 
     @dbus.service.method(GATT_CHRC_IFACE,
                         in_signature='a{sv}',
