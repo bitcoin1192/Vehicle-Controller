@@ -15,7 +15,10 @@ class lockStatus(gattCharacteristics):
 
     def statusUpdate(self,lockUpdate):
         self.current_status = lockUpdate
-
+    
+    @dbus.service.method(GATT_CHRC_IFACE,
+                        in_signature='aya{sv}',
+                        out_signature='ay')
     def WriteValue(self, value, options):
         for byte in value:
             self.buf = self.buf + chr(byte)
@@ -31,7 +34,6 @@ class lockStatus(gattCharacteristics):
         elif self.buf[0:3] == "test":
             self.relayControl.BluetoothKeyStatus(TEST)
         self.buf = ""
-        return ord("OK")
 
     @dbus.service.method(GATT_CHRC_IFACE,
                         in_signature='a{sv}',
