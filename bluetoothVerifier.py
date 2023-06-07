@@ -22,8 +22,10 @@ def main():
     #Instantiated Characteristics of service
     lockCharacteristic = lockStatus(apps.bus,1,uuidConstant.customOneUUID,["read","write","notify"],deviceStatusService)
     deviceOwnerShip = deviceOwner(apps.bus,2,uuidConstant.customTwoUUID,["read"],deviceStatusService)
+    deviceInfo = deviceInfo(apps.bus,3,uuidConstant.customThreeUUID,["read"],deviceStatusService)
     deviceStatusService.add_characteristic(lockCharacteristic)
     deviceStatusService.add_characteristic(deviceOwnerShip)
+    deviceStatusService.add_characteristic(deviceInfo)
 
     #Register AppServices that hold multiple service
     apps.add_service(deviceStatusService)

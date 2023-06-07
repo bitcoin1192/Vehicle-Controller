@@ -65,3 +65,7 @@ class deviceOwner(gattCharacteristics):
         self.uniqueOwner = uid
     def ReadValue(self, options):
         return [dbus.Int32(self.uniqueOwner)]
+
+class deviceInfo(gattCharacteristics):
+    def ReadValue(self, options):
+        return ord("Honda Beat")
