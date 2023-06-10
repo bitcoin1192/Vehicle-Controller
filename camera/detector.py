@@ -17,7 +17,7 @@ matrixCalibPath = "/home/pi/final-skripsi/camera/mtx.correction-2.npy"
 distortionCalibPath = "/home/pi/final-skripsi/camera/dist.correction-2.npy"
 
 #Global Variable
-debugFlagDetector = True
+debugFlagDetector = False
 frameTotal = 1
 
 class ImageProcessor:
