@@ -40,7 +40,7 @@ def main():
             while(True):
                 if Controller.bluetoothKeyVerified == LOCKED:
                     #print("Pausing detection!")
-                    changeLEDColor(LEDOFF)
+                    changeLEDColor(LEDRED)
                     hd.stopFlags(True)
                     hd.resetCounter()
                     time.sleep(0.05)
@@ -50,7 +50,9 @@ def main():
                 elif Controller.bluetoothKeyVerified == UNLOCKED:
                     hd.stopFlags(False)
                 result = hd.tallyResult()
-                if result == None or result == FACENOTFOUND:
+                if result == None:
+                    Controller.HelmetStatus(FACENOTFOUND)
+                elif result == FACENOTFOUND:
                     changeLEDColor(LEDBLUE) 
                     Controller.HelmetStatus(FACENOTFOUND)
                     #print("Warning: Detection not started")
