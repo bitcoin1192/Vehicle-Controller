@@ -7,6 +7,8 @@ import time
 try:
     import board
     import neopixel
+    pixels = neopixel.NeoPixel(board.D12, 1)
+    useLED = True
     RelayPin = 22
     LEDPIN = board.D18
     bus = SystemBus()
@@ -21,9 +23,9 @@ LEDBLUE = (12,0,255)
 LEDRED = (255,12,0)
 LEDOFF = (0,0,0)
 
-def changeLEDColor(self,color):
-        if self.useLED:
-            self.pixels[0] = color
+def changeLEDColor(color):
+        if useLED:
+            pixels[0] = color
         else:
             print("Program not running on Pi, disabling neopixel library")
 def main():
