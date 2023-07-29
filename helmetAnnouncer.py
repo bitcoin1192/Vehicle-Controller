@@ -16,6 +16,7 @@ except ModuleNotFoundError:
 
 def main():
     vidcap = VideoCapture(0)
+    #vidcap = VideoCapture("outdoor-helm-ir-ariq.mp4")
     if vidcap.isOpened() is True:
         td = detector.ImageProcessor(vidcap)
         fd = detector.FaceDetector(td,128,128,1.7)
@@ -24,10 +25,10 @@ def main():
         try:
             while(True):
                 if Controller.bluetoothKeyVerified == LOCKED:
-                    print("Pausing detection!")
+#                    print("Pausing detection!")
                     hd.stopFlags(True)
                     hd.resetCounter()
-                    time.sleep(0.35)
+                    time.sleep(0.05)
                 elif Controller.bluetoothKeyVerified == TEST:
                     hd.stopFlags(False)
                     print("Bluetooth: TEST")
@@ -35,9 +36,10 @@ def main():
                     hd.stopFlags(False)
                 result = hd.tallyResult()
                 if result == None:
-                    print("Warning: Detection not started")
+                    pass 
+#                   print("Warning: Detection not started")
                 else:
-                    print("Result is: {}".format(result))
+#                    print("Result is: {}".format(result))
                     Controller.HelmetStatus(result)
         except GLib.Error as err:
             print("Error: Complementary program exitting")

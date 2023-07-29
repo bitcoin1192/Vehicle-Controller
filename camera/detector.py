@@ -17,8 +17,8 @@ matrixCalibPath = "/home/pi/final-skripsi/camera/mtx.correction-2.npy"
 distortionCalibPath = "/home/pi/final-skripsi/camera/dist.correction-2.npy"
 
 #Global Variable
-debugFlagDetector = True
-frameTotal = 1
+debugFlagDetector = False
+frameTotal = 0
 
 class ImageProcessor:
     def __init__(self, CVCaptureDevice) -> None:
@@ -37,7 +37,7 @@ class ImageProcessor:
         retry = 0
         while(retry < 5):
             ret, frame = self.vid.read()
-            self.debug()
+            #self.debug()
             if ret == True:
                 x,y,w,h = self.roi
                 dst = cv2.undistort(frame, self.mtxconst, self.distconst, None, self.newcameramtx)
@@ -54,7 +54,9 @@ class ImageProcessor:
     def ImagePreProcessing(self):
         #Convert camera input to opencv gray output
         global debugFlagDetector
+        global frameTotal
         inputImage = self.__getImage()
+        frameTotal += 1
         norm = np.zeros((128,128))
         gray = cv2.cvtColor(inputImage, cv2.COLOR_RGB2GRAY)
         norm = cv2.normalize(gray,norm,0,255,cv2.NORM_MINMAX)
@@ -69,6 +71,7 @@ class ImageProcessor:
     def debug(self):
         self.toc = self.tic
         self.tic = time.time()
+        #print("debug is {}".format(debugFlagDetector))
         print("I'm fetching image at {} fps".format(1000/((self.tic-self.toc)*1000)))
     
 
@@ -87,23 +90,27 @@ class FaceDetector:
         imageTupple = self.ImgProcess.ImagePreProcessing()
         grayImage = imageTupple[0]
         colorImage = imageTupple[1]
-        self.debug(grayImage)
+        #self.debug(grayImage)
         faceImage = []
         facePosition = self.face_cascade.detectMultiScale(grayImage, scaleFactor=1.3, minNeighbors=3)
+        if len(facePosition) == 0 and debugFlagDetector:
+            self.debug(colorImage,"NOFACE")
         for faceCoordinate in facePosition:
             x,y,width,height = faceCoordinate
             if width < self.minPixelSize:
                 faceImage.clear()
+                if debugFlagDetector:
+                    self.debug(colorImage,"SMALL")
                 print("Rejected: Width is less than 128")
             else:
                 start, end = self.calculatePixelLocation(x,y,width,height)
                 if start[0] < 0 or start[1] < 0 or end[0] > 1280 or end[1] > 720:
+                    if debugFlagDetector:
+                        self.debug(colorImage,"OOB")
                     pass
                 else:
-                    print("Detecting face")
+                    #print("Face Detected, Continue to Helmet Detection")
                     resizeImage = cv2.resize(colorImage[start[1]:end[1],start[0]:end[0]],(128,128),cv2.INTER_AREA)
-                    if debugFlagDetector:
-                        self.debug(resizeImage)
                     faceImage.append(resizeImage)
         self.tempImage = faceImage
         return faceImage
@@ -115,11 +122,11 @@ class FaceDetector:
         new_end = (int(center_x+(w/2*self.fS_scale)),int(center_y+(h/2*self.fS_scale)))
         return new_start,new_end
 
-    def debug(self,img):
+    def debug(self,img,msg):
         global frameTotal
-        cv2.imwrite("/home/pi/result-debug/image-{}.jpg".format(frameTotal),img)
+        cv2.imwrite("/home/pi/result-debug/facedetector-{}-{}.jpg".format(frameTotal,msg),img)
         print("Debug: Writing frame {} to debug folder".format(frameTotal))  
-        frameTotal += 1
+        #frameTotal += 1
 
 
 class HelmetDetector:
@@ -139,7 +146,7 @@ class HelmetDetector:
     
     def debug(self, resizeImage, detectResult):
         global frameTotal
-        cv2.imwrite("/home/pi/result-debug/image-{}-{}.jpg".format(frameTotal,detectResult),resizeImage)
+        cv2.imwrite("/home/pi/result-debug/helmetdetector-{}-{}.jpg".format(frameTotal,detectResult),resizeImage)
         print("Debug: Writing helmet detection frame {} to debug folder".format(detectResult))
 
 
@@ -180,13 +187,16 @@ class HelmetDetector:
                 if debugFlagDetector:
                     self.debug(face,"helmet-{}".format(output_data[0][0]))
                 print(txtPrintImg[0]) 
-            if output_data[0][1] > output_data[0][0] and output_data[0][1] > self.confidence:
+            elif output_data[0][1] > output_data[0][0] and output_data[0][1] > self.confidence:
                 plus = np.array([0,1])
                 self.tallyCounter = np.add(self.tallyCounter,plus)
                 txtPrintImg = ["Helmet not Detected",(0,0,255)]
                 if debugFlagDetector:
                     self.debug(face,"nohelmet-{}".format(output_data[0][1]))
                 print(txtPrintImg[0])
+            else:
+                if debugFlagDetector:
+                    self.debug(face,"rejected-{}-{}".format(output_data[0][0],output_data[0][1]))
             self.counter += 1
 
     """This function is called from helmetAnnouncer.py to get the current helmet status.

@@ -4,9 +4,11 @@ from time import sleep
 currentDir = "/home/pi/final-skripsi/"
 pythonExec = "python3"
 def main():
+    subprocess.run("echo 580 > /sys/kernel/debug/bluetooth/hci0/adv_min_interval",shell=True)
+    subprocess.run("echo 620 > /sys/kernel/debug/bluetooth/hci0/adv_max_interval",shell=True)
     relayProcess = subprocess.Popen([pythonExec,currentDir+"RelayControl.py"])
     detectorProcess = subprocess.Popen([pythonExec,currentDir+"helmetAnnouncer.py"])
-    sleep(4)
+    sleep(2)
     authenticatorProcess = subprocess.Popen([pythonExec,currentDir+"bluetoothVerifier.py"])
     processList = [relayProcess,detectorProcess,authenticatorProcess]
     try:
