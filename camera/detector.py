@@ -200,7 +200,7 @@ class HelmetDetector:
                     self.debug(face,"rejected-{}-{}".format(output_data[0][0],output_data[0][1]))
             self.counter += 1
         else:
-            self.currentHelmetStatus == FACENOTFOUND
+            self.currentHelmetStatus = FACENOTFOUND
 
     """This function is called from helmetAnnouncer.py to get the current helmet status.
        It will return True if helmet is detected, False if helmet is not detected. 
