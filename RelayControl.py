@@ -26,12 +26,6 @@ busName = "com.sisalma.pydbus"
 RELAYON = 0
 RELAYOFF = 1
 
-LEDGREEN = (0,255,12)
-LEDYELLOW = (255,255,0)
-LEDBLUE = (12,0,255)
-LEDRED = (255,12,0)
-LEDOFF = (0,0,0)
-
 class RelayLogic:
     """
     <node>
@@ -77,16 +71,16 @@ class RelayLogic:
     def lockUnlockIO(self):
         if self._bluetoothKeyVerified == UNLOCKED and self._helmetDetected == HELMETFOUND:
             self.RelayState = RELAYON
-            self.changeLEDColor(LEDGREEN)
+            #self.changeLEDColor(LEDGREEN)
         elif self._bluetoothKeyVerified == UNLOCKED and self._helmetDetected == FACEFOUND:
-            self.changeLEDColor(LEDYELLOW)
+            #self.changeLEDColor(LEDYELLOW)
             self.RelayState = RELAYOFF
         elif self._bluetoothKeyVerified == UNLOCKED and self._helmetDetected == FACENOTFOUND:
-            self.changeLEDColor(LEDBLUE)
+            #self.changeLEDColor(LEDBLUE)
             self.RelayState = RELAYOFF
         elif self._bluetoothKeyVerified == LOCKED :
             self.RelayState = RELAYOFF
-            self.changeLEDColor(LEDRED)
+            #self.changeLEDColor(LEDRED)
             #Send signal to stop detecting helmet on other script listening
             self.PropertiesChanged(busName, {"bluetoothKeyVerified": self._bluetoothKeyVerified}, [])
         self.stateAction()
@@ -111,7 +105,8 @@ class RelayLogic:
             print("Program not running on Pi, disabling neopixel library")
     
     def stopObject(self):
-        self.changeLEDColor(LEDOFF) 
+        pass
+        #self.changeLEDColor(LEDOFF) 
 
     PropertiesChanged = dbus_signal()
 
