@@ -1,4 +1,5 @@
 from math import ceil, floor
+from uuidConstant import FACEFOUND, FACENOTFOUND, HELMETFOUND
 import time
 import numpy as np
 import cv2
@@ -135,7 +136,7 @@ class HelmetDetector:
         self.sampleNeeded = SampleNeeded
         self.confidence = ConfidenceThreshold
         self.FaceDetection = FaceDetector
-        self.currentHelmetStatus = False
+        self.currentHelmetStatus = FACENOTFOUND
         self.stopFlag = False
         self.counter = 0
         self.tallyCounter = np.zeros(2)
@@ -214,9 +215,9 @@ class HelmetDetector:
 
     def _makeDecision(self):
         if self.tallyCounter[0] < self.tallyCounter[1]:
-            self.currentHelmetStatus = False
+            self.currentHelmetStatus = FACEFOUND
         else:
-            self.currentHelmetStatus = True
+            self.currentHelmetStatus = HELMETFOUND
         print(self.tallyCounter)
 
     def resetCounter(self):
@@ -226,5 +227,5 @@ class HelmetDetector:
     def stopFlags(self, input):
         self.stopFlag = input
         if(self.stopFlag == True):
-            self.currentHelmetStatus = False
+            self.currentHelmetStatus = FACENOTFOUND
 
