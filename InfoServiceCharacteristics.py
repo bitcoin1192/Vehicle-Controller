@@ -35,8 +35,11 @@ class lockStatus(gattCharacteristics):
         elif self.buf[0:3] == "test":
             self.relayControl.BluetoothKeyStatus(TEST)
         self.buf = ""
+        retMessage = []
+        for char in "notiftest":
+            retMessage.append(ord(char))
         if self.notifyReq:
-            self.PropertiesChanged(GATT_CHRC_IFACE,{'Value': ord("s")},[])
+            self.PropertiesChanged(GATT_CHRC_IFACE,{'Value': retMessage},[])
 
     @dbus.service.method(GATT_CHRC_IFACE,
                         in_signature='a{sv}',
@@ -67,5 +70,11 @@ class deviceOwner(gattCharacteristics):
         return [dbus.Int32(self.uniqueOwner)]
 
 class deviceInfo(gattCharacteristics):
+    @dbus.service.method(GATT_CHRC_IFACE,
+                        in_signature='a{sv}',
+                        out_signature='ay')
     def ReadValue(self, options):
-        return ord("Honda Beat")
+        msg = []
+        for char in "Honda Beat":
+             msg.append(ord(char))
+        return msg

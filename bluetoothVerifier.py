@@ -1,5 +1,5 @@
 from AppServices import AppServices
-from InfoServiceCharacteristics import deviceOwner, lockStatus
+from InfoServiceCharacteristics import deviceOwner, lockStatus, deviceInfo
 from bluezdbusInterface.gattServices import Service
 from bluezdbusInterface.gattAdvertisement import Advertisement
 import uuidConstant
@@ -20,12 +20,12 @@ def main():
     deviceStatusService = Service(apps.bus, apps.next_index, uuidConstant.statusCharacteristicsUUID, True)
     
     #Instantiated Characteristics of service
-    lockCharacteristic = lockStatus(apps.bus,1,uuidConstant.customOneUUID,["read","write","notify"],deviceStatusService)
+    lockCharacteristic = lockStatus(apps.bus,1,uuidConstant.customOneUUID,["read","write","reliable-write","notify"],deviceStatusService)
     deviceOwnerShip = deviceOwner(apps.bus,2,uuidConstant.customTwoUUID,["read"],deviceStatusService)
-    deviceInfo = deviceInfo(apps.bus,3,uuidConstant.customThreeUUID,["read"],deviceStatusService)
+    deviceInformation = deviceInfo(apps.bus,3,uuidConstant.customThreeUUID,["read"],deviceStatusService)
     deviceStatusService.add_characteristic(lockCharacteristic)
     deviceStatusService.add_characteristic(deviceOwnerShip)
-    deviceStatusService.add_characteristic(deviceInfo)
+    deviceStatusService.add_characteristic(deviceInformation)
 
     #Register AppServices that hold multiple service
     apps.add_service(deviceStatusService)
