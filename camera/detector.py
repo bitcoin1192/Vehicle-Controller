@@ -28,6 +28,7 @@ class ImageProcessor:
         self.vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
         self.vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
         self.vid.set(cv2.CAP_PROP_AUTO_EXPOSURE, 0.75)
+        self.vid.set(cv2.CAP_PROP_BUFFERSIZE, 1)
         self.mtxconst = np.load(matrixCalibPath)
         self.distconst = np.load(distortionCalibPath)
         self.newcameramtx, self.roi = cv2.getOptimalNewCameraMatrix(self.mtxconst, self.distconst, (1280,720), 1, (1280,720))
@@ -99,7 +100,7 @@ class FaceDetector:
         for faceCoordinate in facePosition:
             x,y,width,height = faceCoordinate
             if width < self.minPixelSize:
-                faceImage.clear()
+                #faceImage.clear()
                 if debugFlagDetector:
                     self.debug(colorImage,"SMALL")
                 print("Rejected: Width is less than 128")
@@ -112,7 +113,7 @@ class FaceDetector:
                 else:
                     #print("Face Detected, Continue to Helmet Detection")
                     resizeImage = cv2.resize(colorImage[start[1]:end[1],start[0]:end[0]],(128,128),cv2.INTER_AREA)
-                    faceImage.append(resizeImage)
+                    faceImage = [resizeImage]
         self.tempImage = faceImage
         return faceImage
     
@@ -208,11 +209,10 @@ class HelmetDetector:
        It has intial state of False"""        
     def tallyResult(self):
         if self.stopFlag == False:
+            self.detectHelmet()
             if self.counter >= self.sampleNeeded:
                 self._makeDecision()
                 self.resetCounter()
-            else:
-                self.detectHelmet()
         return self.currentHelmetStatus
 
     def _makeDecision(self):
